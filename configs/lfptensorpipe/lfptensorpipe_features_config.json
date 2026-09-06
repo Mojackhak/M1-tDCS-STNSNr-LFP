@@ -1,0 +1,450 @@
+{
+  "schema": "lfptensorpipe.features-config",
+  "version": 1,
+  "features": {
+    "active_metric": "periodic",
+    "axes_by_metric": {
+      "aperiodic": {
+        "bands": [],
+        "times": [
+          {
+            "name": "Pre",
+            "start": 0.0,
+            "end": 25.0
+          },
+          {
+            "name": "Early",
+            "start": 25.0,
+            "end": 50.0
+          },
+          {
+            "name": "Late",
+            "start": 50.0,
+            "end": 75.0
+          },
+          {
+            "name": "Post",
+            "start": 75.0,
+            "end": 100.0
+          }
+        ]
+      },
+      "burst": {
+        "bands": [],
+        "times": [
+          {
+            "name": "Pre",
+            "start": 0.0,
+            "end": 25.0
+          },
+          {
+            "name": "Early",
+            "start": 25.0,
+            "end": 50.0
+          },
+          {
+            "name": "Late",
+            "start": 50.0,
+            "end": 75.0
+          },
+          {
+            "name": "Post",
+            "start": 75.0,
+            "end": 100.0
+          }
+        ]
+      },
+      "ciplv": {
+        "bands": [
+          {
+            "name": "delta",
+            "start": 2.0,
+            "end": 4.0
+          },
+          {
+            "name": "theta",
+            "start": 4.0,
+            "end": 8.0
+          },
+          {
+            "name": "alpha",
+            "start": 8.0,
+            "end": 13.0
+          },
+          {
+            "name": "beta_low",
+            "start": 13.0,
+            "end": 20.0
+          },
+          {
+            "name": "beta_high",
+            "start": 20.0,
+            "end": 35.0
+          },
+          {
+            "name": "gamma_low",
+            "start": 35.0,
+            "end": 60.0
+          },
+          {
+            "name": "gamma_high",
+            "start": 60.0,
+            "end": 90.0
+          }
+        ],
+        "times": [
+          {
+            "name": "Pre",
+            "start": 0.0,
+            "end": 25.0
+          },
+          {
+            "name": "Early",
+            "start": 25.0,
+            "end": 50.0
+          },
+          {
+            "name": "Late",
+            "start": 50.0,
+            "end": 75.0
+          },
+          {
+            "name": "Post",
+            "start": 75.0,
+            "end": 100.0
+          }
+        ]
+      },
+      "imcoh_abs": {
+        "bands": [
+          {
+            "name": "delta",
+            "start": 2.0,
+            "end": 4.0
+          },
+          {
+            "name": "theta",
+            "start": 4.0,
+            "end": 8.0
+          },
+          {
+            "name": "alpha",
+            "start": 8.0,
+            "end": 13.0
+          },
+          {
+            "name": "beta_low",
+            "start": 13.0,
+            "end": 20.0
+          },
+          {
+            "name": "beta_high",
+            "start": 20.0,
+            "end": 35.0
+          },
+          {
+            "name": "gamma_low",
+            "start": 35.0,
+            "end": 60.0
+          },
+          {
+            "name": "gamma_high",
+            "start": 60.0,
+            "end": 90.0
+          }
+        ],
+        "times": [
+          {
+            "name": "Pre",
+            "start": 0.0,
+            "end": 25.0
+          },
+          {
+            "name": "Early",
+            "start": 25.0,
+            "end": 50.0
+          },
+          {
+            "name": "Late",
+            "start": 50.0,
+            "end": 75.0
+          },
+          {
+            "name": "Post",
+            "start": 75.0,
+            "end": 100.0
+          }
+        ]
+      },
+      "periodic": {
+        "bands": [
+          {
+            "name": "delta",
+            "start": 2.0,
+            "end": 4.0
+          },
+          {
+            "name": "theta",
+            "start": 4.0,
+            "end": 8.0
+          },
+          {
+            "name": "alpha",
+            "start": 8.0,
+            "end": 13.0
+          },
+          {
+            "name": "beta_low",
+            "start": 13.0,
+            "end": 20.0
+          },
+          {
+            "name": "beta_high",
+            "start": 20.0,
+            "end": 35.0
+          },
+          {
+            "name": "gamma_low",
+            "start": 35.0,
+            "end": 60.0
+          },
+          {
+            "name": "gamma_high",
+            "start": 60.0,
+            "end": 90.0
+          }
+        ],
+        "times": [
+          {
+            "name": "Pre",
+            "start": 0.0,
+            "end": 25.0
+          },
+          {
+            "name": "Early",
+            "start": 25.0,
+            "end": 50.0
+          },
+          {
+            "name": "Late",
+            "start": 50.0,
+            "end": 75.0
+          },
+          {
+            "name": "Post",
+            "start": 75.0,
+            "end": 100.0
+          }
+        ]
+      },
+      "psi": {
+        "bands": [],
+        "times": [
+          {
+            "name": "Pre",
+            "start": 0.0,
+            "end": 25.0
+          },
+          {
+            "name": "Early",
+            "start": 25.0,
+            "end": 50.0
+          },
+          {
+            "name": "Late",
+            "start": 50.0,
+            "end": 75.0
+          },
+          {
+            "name": "Post",
+            "start": 75.0,
+            "end": 100.0
+          }
+        ]
+      },
+      "raw_power": {
+        "bands": [
+          {
+            "name": "delta",
+            "start": 2.0,
+            "end": 4.0
+          },
+          {
+            "name": "theta",
+            "start": 4.0,
+            "end": 8.0
+          },
+          {
+            "name": "alpha",
+            "start": 8.0,
+            "end": 13.0
+          },
+          {
+            "name": "beta_low",
+            "start": 13.0,
+            "end": 20.0
+          },
+          {
+            "name": "beta_high",
+            "start": 20.0,
+            "end": 35.0
+          },
+          {
+            "name": "gamma_low",
+            "start": 35.0,
+            "end": 60.0
+          },
+          {
+            "name": "gamma_high",
+            "start": 60.0,
+            "end": 90.0
+          }
+        ],
+        "times": [
+          {
+            "name": "Pre",
+            "start": 0.0,
+            "end": 25.0
+          },
+          {
+            "name": "Early",
+            "start": 25.0,
+            "end": 50.0
+          },
+          {
+            "name": "Late",
+            "start": 50.0,
+            "end": 75.0
+          },
+          {
+            "name": "Post",
+            "start": 75.0,
+            "end": 100.0
+          }
+        ]
+      },
+      "trgc": {
+        "bands": [
+          {
+            "name": "delta",
+            "start": 2.0,
+            "end": 4.0
+          },
+          {
+            "name": "theta",
+            "start": 4.0,
+            "end": 8.0
+          },
+          {
+            "name": "alpha",
+            "start": 8.0,
+            "end": 13.0
+          },
+          {
+            "name": "beta_low",
+            "start": 13.0,
+            "end": 20.0
+          },
+          {
+            "name": "beta_high",
+            "start": 20.0,
+            "end": 35.0
+          },
+          {
+            "name": "gamma_low",
+            "start": 35.0,
+            "end": 60.0
+          },
+          {
+            "name": "gamma_high",
+            "start": 60.0,
+            "end": 90.0
+          }
+        ],
+        "times": [
+          {
+            "name": "Pre",
+            "start": 0.0,
+            "end": 25.0
+          },
+          {
+            "name": "Early",
+            "start": 25.0,
+            "end": 50.0
+          },
+          {
+            "name": "Late",
+            "start": 50.0,
+            "end": 75.0
+          },
+          {
+            "name": "Post",
+            "start": 75.0,
+            "end": 100.0
+          }
+        ]
+      },
+      "wpli": {
+        "bands": [
+          {
+            "name": "delta",
+            "start": 2.0,
+            "end": 4.0
+          },
+          {
+            "name": "theta",
+            "start": 4.0,
+            "end": 8.0
+          },
+          {
+            "name": "alpha",
+            "start": 8.0,
+            "end": 13.0
+          },
+          {
+            "name": "beta_low",
+            "start": 13.0,
+            "end": 20.0
+          },
+          {
+            "name": "beta_high",
+            "start": 20.0,
+            "end": 35.0
+          },
+          {
+            "name": "gamma_low",
+            "start": 35.0,
+            "end": 60.0
+          },
+          {
+            "name": "gamma_high",
+            "start": 60.0,
+            "end": 90.0
+          }
+        ],
+        "times": [
+          {
+            "name": "Pre",
+            "start": 0.0,
+            "end": 25.0
+          },
+          {
+            "name": "Early",
+            "start": 25.0,
+            "end": 50.0
+          },
+          {
+            "name": "Late",
+            "start": 50.0,
+            "end": 75.0
+          },
+          {
+            "name": "Post",
+            "start": 75.0,
+            "end": 100.0
+          }
+        ]
+      }
+    }
+  }
+}

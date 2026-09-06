@@ -1,0 +1,185 @@
+paths:
+  input_root: /path/to/data/derivatives/lfptensorpipe
+  output_root: /path/to/data/summary/table
+
+discovery:
+  subject_glob: "sub-*"
+  record_glob: "tDCS_*"
+  features_dir: features
+  ignore_basename_prefixes:
+    - "._"
+
+domains:
+  local:
+    kind: node
+  connectivity:
+    kind: pair
+
+feature_outputs:
+  local:
+    aperiodic: [mean-scalar, mean-trace]
+    burst:
+      [mean-scalar, duration-scalar, rate-scalar, occupancy-scalar, na-raw]
+    periodic: [mean-scalar, mean-spectral, mean-trace, na-raw]
+    raw_power: [mean-scalar, mean-spectral, mean-trace, na-raw]
+  connectivity:
+    ciplv:
+      direction: undirected
+      files: [mean-scalar, mean-spectral, mean-trace, na-raw]
+    imcoh_abs:
+      direction: undirected
+      files: [mean-scalar, mean-spectral, mean-trace, na-raw]
+    wpli:
+      direction: undirected
+      files: [mean-scalar, mean-spectral, mean-trace, na-raw]
+    psi:
+      direction: directed
+      files: [mean-scalar, mean-trace, na-raw]
+    trgc:
+      direction: directed
+      files: [mean-scalar, mean-spectral, mean-trace, na-raw]
+
+metadata:
+  representations: [scalar, spectral, trace, raw]
+  reducers: [mean, duration, rate, occupancy]
+  missing_reducer: none
+  phase_for_unsplit: All
+  polarity_tokens:
+    excite: Anodal
+    inhibit: Cathodal
+  stimulation_side_regex: "_(L|R)$"
+
+anatomy:
+  channel_side:
+    left_min: 0
+    left_max: 7
+    right_min: 8
+    right_max: 15
+  local_keep: [STN, SNr]
+  local_exclude: [Mid, EXT]
+  undirected_pair_keep: SNr-STN
+  directed_pair_keep: "SNr→STN"
+  laterality_labels:
+    ipsilateral: Ipsi
+    contralateral: Contra
+  coordinate_sign_tolerance: 0.0
+
+coordinates:
+  enabled: true
+  backend: matlab_leaddbs
+  direction: L2R
+  matlab_executable: /path/to/matlab
+  helper_dir: lfp_cohort/matlab
+  leaddbs_root: /path/to/leaddbs
+  leaddbs_commit: cc860d6cf0805da7e070b24e0b856709069d04f7
+  space: MNI152NLin2009bAsym
+  transform_path: /path/to/leaddbs/templates/space/MNI152NLin2009bAsym/fliplr/InverseComposite.nii.gz
+
+transform:
+  modes:
+    raw_power:
+      default: dB
+    periodic:
+      default: dB
+    aperiodic:
+      default: none
+    burst:
+      rate: asinh
+      duration: log10
+      occupancy: none
+      mean: log10
+      "none": log10
+      default: none
+    imcoh_abs:
+      default: fisherz
+    ciplv:
+      default: logit
+    wpli:
+      default: logit
+    trgc:
+      default: none
+    psi:
+      default: none
+    default:
+      default: none
+  allowed_metadata_overrides:
+    - metric: burst
+      reducer: rate
+      source: none
+      applied: asinh
+    - metric: burst
+      reducer: duration
+      source: none
+      applied: log10
+    - metric: burst
+      reducer: mean
+      source: none
+      applied: log10
+    - metric: burst
+      reducer: none
+      source: none
+      applied: log10
+
+outlier_filter:
+  enabled_representations: []
+  disabled_representations: [scalar, spectral, trace, raw]
+  group_candidates:
+    [Domain, Metric, FeatureOutput, Reducer, Region, PairRegion, Lat, Polar, Phase, Band]
+  mode: mcd
+  alpha: 0.99
+  support_fraction: 0.95
+  pca: true
+  pca_max_components: 20
+  pca_explained_var: 0.99
+  min_n: 8
+  min_n_over_p: 1.2
+  robust_scale: true
+  relax_if_all_rejected: true
+  relax_alpha: 0.999
+  random_state: 42
+
+normalization:
+  mode: mean
+  mode_baseline: mean
+  scalar_spectral:
+    baseline:
+      Phase: Pre
+  trace_raw:
+    baseline: [0, 25]
+    slice_mode: percent
+  valid_duration_threshold: null
+
+aggregation:
+  mode: mean
+  align: strict
+  nested_axis_atol: 1.0e-9
+  drop_empty: false
+  contact:
+    reduce: [Epoch]
+  region:
+    reduce: [Channel, ChannelPair]
+  subject:
+    reduce: [Lat]
+  member_separator: "|"
+
+connectivity_split:
+  channel_pair_backup: ChannelPair_bak
+  region_backup: Region_bak
+  undirected_roles: [SNrEndpoint, STNEndpoint]
+  directed_roles: [Source, Target]
+
+execution:
+  overwrite: false
+  pickle_protocol: 5
+  directories:
+    merge: merge
+    transform: transform
+    normalize: normalize
+    aggregate: aggregate
+    split: split
+    manifest: manifest
+    qc: qc
+
+validation:
+  sample_rate_hz: 50.0
+  phase_order: [Pre, Early, Late, Post]

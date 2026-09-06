@@ -1,0 +1,79 @@
+visualization:
+  id: submission-clinical-correlation-fit
+  kind: correlation_fit
+
+paths:
+  stats_root: /path/to/data/summary/stats/clinical-correlation
+  correlations: /path/to/data/summary/stats/clinical-correlation/results/correlations.csv
+  fit_points: /path/to/data/summary/stats/clinical-correlation/derived/correlation_fit_points.csv
+  output_root: /path/to/results/submission/data/clinical-correlation
+  manifest_root: /path/to/results/submission/data/clinical-correlation/fit
+
+inputs:
+  stats_analysis_id: clinical-correlation
+  accepted_statuses: [ok, insufficient_n, constant_input]
+  selection: {column: p_holm, operator: lt, value: 0.05}
+  x_column: XRaw
+  y_column: YRaw
+  p_column: p_holm
+
+figures:
+  - {id: clinical-correlation-fit, test_id: clinical-correlation, layout: stratum_single}
+
+factor_levels:
+  Phase: [Early, Late, Post]
+  Lat: [Ipsi, Contra]
+  Polar: [Anodal, Cathodal]
+
+labels:
+  delta_prefix: "Δ"
+  polarity: {Anodal: "⊕", Cathodal: "⊖"}
+  region: {SNr: SNr, STN: STN, SNr-STN: "SNr–STN", "SNr→STN": "SNr→STN"}
+  endpoint: {stn-3m: STN-DBS, stn-snr-3m: "STN+SNr-DBS"}
+
+style:
+  font: {family: Arial Unicode MS, strip_pt: 7, axis_pt: 7, tick_pt: 6}
+  geometry_mm:
+    boxsize: [30.0, 25.0]
+    panel_gap: [0.0, 0.0]
+    strip_top_height: 4.5
+    strip_right_width: 4.5
+    strip_pad: 2.0
+    x_label_offset: 5.0
+    y_label_offset: 5.0
+  strips:
+    top_background: "#D7E3E0"
+    right_background: "#E3DCCF"
+    text_color: black
+    font_weight: bold
+  points: {color_var: ID, palette: viridis, alpha: 1.0, size: 10.0}
+  fit:
+    ordinary_formula: "YRaw ~ XRaw"
+    partial_formula: "YRaw ~ XRaw + Baseline"
+    baseline_reference: median
+    confidence_level: 0.95
+    interval_type: mean
+    line_color: black
+    line_width: 1.0
+    show_ribbon: true
+    ribbon_alpha: 0.30
+  annotation:
+    p_column: p_holm
+    text_format: "ρ = {beta:.2f}\n$p_{{\\mathrm{{Holm}}}}$ = {p:.3f} ({stars})"
+    small_p_threshold: 0.001
+    small_p_text_format: "ρ = {beta:.2f}\n$p_{{\\mathrm{{Holm}}}}$ < 0.001 (***)"
+    location: auto_by_fit_slope
+    box_alpha: 0.0
+  axes: {grid: false, show_top_right: false}
+  legend: {location: none}
+  transparent: true
+  dpi: 600
+
+outputs:
+  format: pdf
+  filename_template: "analysis-{AnalysisID}_correlation-{CorrelationID}_figure-correlation-fit.pdf"
+  formal_png: false
+  hashes: false
+
+manifests: {figures: figures.csv, points: points.csv}
+execution: {on_error: fail, retry: false, cache: false, resume: false}

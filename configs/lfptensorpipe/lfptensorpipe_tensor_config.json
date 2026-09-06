@@ -1,0 +1,569 @@
+{
+  "schema": "lfptensorpipe.tensor-config",
+  "version": 4,
+  "tensor": {
+    "selected_metrics": [
+      "raw_power",
+      "periodic_aperiodic",
+      "imcoh_abs",
+      "ciplv",
+      "wpli",
+      "trgc",
+      "psi",
+      "burst"
+    ],
+    "active_metric": "burst",
+    "mask_edge_effects": true,
+    "cpu_percent": 90.0,
+    "metric_params": {
+      "raw_power": {
+        "low_freq_hz": 2.0,
+        "high_freq_hz": 90.0,
+        "freq_step_hz": 0.5,
+        "time_resolution_s": 2.5,
+        "hop_s": 0.1,
+        "method": "multitaper",
+        "min_cycles": 3.0,
+        "max_cycles": null,
+        "mt_time_bandwidth_product": 6.0,
+        "mt_min_cycles": 5.0,
+        "mt_max_cycles": null,
+        "notches": [
+          41.75,
+          83.5,
+          125.25,
+          167.0
+        ],
+        "notch_radii": 2.0,
+        "selected_channels": [
+          "0_1",
+          "1_2",
+          "2_3",
+          "8_9",
+          "9_10",
+          "10_11"
+        ]
+      },
+      "periodic_aperiodic": {
+        "low_freq_hz": 2.0,
+        "high_freq_hz": 90.0,
+        "freq_step_hz": 0.5,
+        "time_resolution_s": 2.5,
+        "hop_s": 0.1,
+        "method": "multitaper",
+        "freq_range_hz": [
+          1.0,
+          95.0
+        ],
+        "min_cycles": 3.0,
+        "max_cycles": null,
+        "mt_time_bandwidth_product": 6.0,
+        "mt_min_cycles": 5.0,
+        "mt_max_cycles": null,
+        "freq_smooth_enabled": true,
+        "freq_smooth_sigma": 1.0,
+        "time_smooth_enabled": false,
+        "time_smooth_kernel_size": 3,
+        "aperiodic_mode": "fixed",
+        "peak_width_limits_hz": [
+          2.0,
+          12.0
+        ],
+        "max_n_peaks": 8.0,
+        "min_peak_height": 0.15,
+        "peak_threshold": 2.0,
+        "fit_qc_threshold": 0.6,
+        "notches": [
+          41.75,
+          83.5,
+          125.25,
+          167.0
+        ],
+        "notch_radii": 2.0,
+        "selected_channels": [
+          "0_1",
+          "1_2",
+          "2_3",
+          "8_9",
+          "9_10",
+          "10_11"
+        ]
+      },
+      "coherence": {
+        "low_freq_hz": 2.0,
+        "high_freq_hz": 90.0,
+        "freq_step_hz": 0.5,
+        "time_resolution_s": 2.5,
+        "hop_s": 0.1,
+        "method": "multitaper",
+        "mt_time_bandwidth_product": 6.0,
+        "mt_min_cycles": 5.0,
+        "mt_max_cycles": null,
+        "min_cycles": null,
+        "max_cycles": null,
+        "notches": [
+          41.75,
+          83.5,
+          125.25,
+          167.0
+        ],
+        "notch_radii": 2.0,
+        "selected_pairs": [
+          [
+            "0_1",
+            "1_2"
+          ],
+          [
+            "0_1",
+            "2_3"
+          ],
+          [
+            "1_2",
+            "2_3"
+          ],
+          [
+            "8_9",
+            "9_10"
+          ],
+          [
+            "10_11",
+            "8_9"
+          ],
+          [
+            "10_11",
+            "9_10"
+          ]
+        ]
+      },
+      "imcoh_abs": {
+        "low_freq_hz": 2.0,
+        "high_freq_hz": 90.0,
+        "freq_step_hz": 0.5,
+        "time_resolution_s": 2.5,
+        "hop_s": 0.1,
+        "method": "multitaper",
+        "mt_time_bandwidth_product": 6.0,
+        "mt_min_cycles": 5.0,
+        "mt_max_cycles": null,
+        "min_cycles": 3.0,
+        "max_cycles": null,
+        "notches": [
+          41.75,
+          83.5,
+          125.25,
+          167.0
+        ],
+        "notch_radii": 2.0,
+        "selected_pairs": [
+          [
+            "0_1",
+            "1_2"
+          ],
+          [
+            "0_1",
+            "2_3"
+          ],
+          [
+            "1_2",
+            "2_3"
+          ],
+          [
+            "8_9",
+            "9_10"
+          ],
+          [
+            "10_11",
+            "8_9"
+          ],
+          [
+            "10_11",
+            "9_10"
+          ]
+        ]
+      },
+      "plv": {
+        "low_freq_hz": 2.0,
+        "high_freq_hz": 90.0,
+        "freq_step_hz": 0.5,
+        "time_resolution_s": 2.5,
+        "hop_s": 0.1,
+        "method": "multitaper",
+        "mt_time_bandwidth_product": 6.0,
+        "mt_min_cycles": 5.0,
+        "mt_max_cycles": null,
+        "min_cycles": null,
+        "max_cycles": null,
+        "notches": [
+          41.75,
+          83.5,
+          125.25,
+          167.0
+        ],
+        "notch_radii": 2.0,
+        "selected_pairs": [
+          [
+            "0_1",
+            "1_2"
+          ],
+          [
+            "0_1",
+            "2_3"
+          ],
+          [
+            "1_2",
+            "2_3"
+          ],
+          [
+            "8_9",
+            "9_10"
+          ],
+          [
+            "10_11",
+            "8_9"
+          ],
+          [
+            "10_11",
+            "9_10"
+          ]
+        ]
+      },
+      "ciplv": {
+        "low_freq_hz": 2.0,
+        "high_freq_hz": 90.0,
+        "freq_step_hz": 0.5,
+        "time_resolution_s": 2.5,
+        "hop_s": 0.1,
+        "method": "multitaper",
+        "mt_time_bandwidth_product": 6.0,
+        "mt_min_cycles": 5.0,
+        "mt_max_cycles": null,
+        "min_cycles": 3.0,
+        "max_cycles": null,
+        "notches": [
+          41.75,
+          83.5,
+          125.25,
+          167.0
+        ],
+        "notch_radii": 2.0,
+        "selected_pairs": [
+          [
+            "0_1",
+            "1_2"
+          ],
+          [
+            "0_1",
+            "2_3"
+          ],
+          [
+            "1_2",
+            "2_3"
+          ],
+          [
+            "8_9",
+            "9_10"
+          ],
+          [
+            "10_11",
+            "8_9"
+          ],
+          [
+            "10_11",
+            "9_10"
+          ]
+        ]
+      },
+      "pli": {
+        "low_freq_hz": 2.0,
+        "high_freq_hz": 90.0,
+        "freq_step_hz": 0.5,
+        "time_resolution_s": 2.5,
+        "hop_s": 0.1,
+        "method": "multitaper",
+        "mt_time_bandwidth_product": 6.0,
+        "mt_min_cycles": 5.0,
+        "mt_max_cycles": null,
+        "min_cycles": null,
+        "max_cycles": null,
+        "notches": [
+          41.75,
+          83.5,
+          125.25,
+          167.0
+        ],
+        "notch_radii": 2.0,
+        "selected_pairs": [
+          [
+            "0_1",
+            "1_2"
+          ],
+          [
+            "0_1",
+            "2_3"
+          ],
+          [
+            "1_2",
+            "2_3"
+          ],
+          [
+            "8_9",
+            "9_10"
+          ],
+          [
+            "10_11",
+            "8_9"
+          ],
+          [
+            "10_11",
+            "9_10"
+          ]
+        ]
+      },
+      "wpli": {
+        "low_freq_hz": 2.0,
+        "high_freq_hz": 90.0,
+        "freq_step_hz": 0.5,
+        "time_resolution_s": 2.5,
+        "hop_s": 0.1,
+        "method": "multitaper",
+        "mt_time_bandwidth_product": 6.0,
+        "mt_min_cycles": 5.0,
+        "mt_max_cycles": null,
+        "min_cycles": 3.0,
+        "max_cycles": null,
+        "notches": [
+          41.75,
+          83.5,
+          125.25,
+          167.0
+        ],
+        "notch_radii": 2.0,
+        "selected_pairs": [
+          [
+            "0_1",
+            "1_2"
+          ],
+          [
+            "0_1",
+            "2_3"
+          ],
+          [
+            "1_2",
+            "2_3"
+          ],
+          [
+            "8_9",
+            "9_10"
+          ],
+          [
+            "10_11",
+            "8_9"
+          ],
+          [
+            "10_11",
+            "9_10"
+          ]
+        ]
+      },
+      "trgc": {
+        "low_freq_hz": 2.0,
+        "high_freq_hz": 90.0,
+        "freq_step_hz": 0.5,
+        "time_resolution_s": 2.5,
+        "hop_s": 0.1,
+        "method": "multitaper",
+        "mt_time_bandwidth_product": 6.0,
+        "mt_min_cycles": 5.0,
+        "mt_max_cycles": null,
+        "min_cycles": 3.0,
+        "max_cycles": null,
+        "gc_n_lags": 40,
+        "group_by_samples": false,
+        "round_ms": 50.0,
+        "notches": [
+          41.75,
+          83.5,
+          125.25,
+          167.0
+        ],
+        "notch_radii": 2.0,
+        "selected_pairs": [
+          [
+            "0_1",
+            "1_2"
+          ],
+          [
+            "0_1",
+            "2_3"
+          ],
+          [
+            "1_2",
+            "2_3"
+          ],
+          [
+            "8_9",
+            "9_10"
+          ],
+          [
+            "8_9",
+            "10_11"
+          ],
+          [
+            "9_10",
+            "10_11"
+          ]
+        ]
+      },
+      "psi": {
+        "freq_step_hz": 0.5,
+        "bands": [
+          {
+            "name": "delta",
+            "start": 2.0,
+            "end": 4.0
+          },
+          {
+            "name": "theta",
+            "start": 4.0,
+            "end": 8.0
+          },
+          {
+            "name": "alpha",
+            "start": 8.0,
+            "end": 13.0
+          },
+          {
+            "name": "beta_low",
+            "start": 13.0,
+            "end": 20.0
+          },
+          {
+            "name": "beta_high",
+            "start": 20.0,
+            "end": 35.0
+          },
+          {
+            "name": "gamma_low",
+            "start": 35.0,
+            "end": 60.0
+          },
+          {
+            "name": "gamma_high",
+            "start": 60.0,
+            "end": 90.0
+          }
+        ],
+        "time_resolution_s": 2.5,
+        "hop_s": 0.1,
+        "method": "multitaper",
+        "mt_time_bandwidth_product": 6.0,
+        "mt_min_cycles": 5.0,
+        "mt_max_cycles": null,
+        "min_cycles": 3.0,
+        "max_cycles": null,
+        "notches": [
+          41.75,
+          83.5,
+          125.25,
+          167.0
+        ],
+        "notch_radii": 2.0,
+        "selected_pairs": [
+          [
+            "0_1",
+            "1_2"
+          ],
+          [
+            "0_1",
+            "2_3"
+          ],
+          [
+            "1_2",
+            "2_3"
+          ],
+          [
+            "8_9",
+            "9_10"
+          ],
+          [
+            "8_9",
+            "10_11"
+          ],
+          [
+            "9_10",
+            "10_11"
+          ]
+        ]
+      },
+      "burst": {
+        "bands": [
+          {
+            "name": "delta",
+            "start": 2.0,
+            "end": 4.0
+          },
+          {
+            "name": "theta",
+            "start": 4.0,
+            "end": 8.0
+          },
+          {
+            "name": "alpha",
+            "start": 8.0,
+            "end": 13.0
+          },
+          {
+            "name": "beta_low",
+            "start": 13.0,
+            "end": 20.0
+          },
+          {
+            "name": "beta_high",
+            "start": 20.0,
+            "end": 35.0
+          },
+          {
+            "name": "gamma_low",
+            "start": 35.0,
+            "end": 60.0
+          },
+          {
+            "name": "gamma_high",
+            "start": 60.0,
+            "end": 90.0
+          }
+        ],
+        "percentile": 75.0,
+        "baseline_keep": [
+          "Pre"
+        ],
+        "boundary_isolated_filter": true,
+        "method": "hilbert",
+        "hilbert_filter_method": "fir",
+        "freq_step_hz": 0.5,
+        "morlet_n_cycles": 6.0,
+        "mt_n_cycles": 5.0,
+        "mt_time_bandwidth_product": 6.0,
+        "hilbert_edge_tolerance_pct": 10.0,
+        "min_cycles": 2.0,
+        "max_cycles": null,
+        "thresholds": null,
+        "notches": [
+          41.75,
+          83.5,
+          125.25,
+          167.0
+        ],
+        "notch_radii": 2.0,
+        "selected_channels": [
+          "0_1",
+          "1_2",
+          "2_3",
+          "8_9",
+          "9_10",
+          "10_11"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,188 @@
+visualization:
+  id: phase-scalar
+  kind: scalar
+
+paths:
+  table_root: /path/to/data/summary/table
+  stats_root: /path/to/data/summary/stats
+  models_manifest: /path/to/data/summary/stats/manifest/phase-by-lat/models.csv
+  stats_outputs_manifest: /path/to/data/summary/stats/manifest/phase-by-lat/outputs.csv
+  output_root: /path/to/data/summary/viz
+  manifest_root: /path/to/data/summary/viz/manifest/phase-scalar
+
+inputs:
+  stats_analysis_id: phase-by-lat
+  accepted_model_statuses: [ok, singular, convergence_warning]
+  test_kind: emm_pairwise
+  row_filter:
+    IncludeAggregate: true
+    finite_columns: [Value]
+
+figures:
+  - id: Phase
+    test_id: Phase
+    x_var: Phase
+
+  - id: Phase-Lat
+    test_id: Phase-Lat
+    x_var: Phase
+    row_var: Lat
+    row_levels: [Ipsi, Contra]
+
+factor_levels:
+  Phase: [Pre, Early, Late, Post]
+  Lat: [Ipsi, Contra]
+
+labels:
+  polarity:
+    Anodal: "⊕"
+    Cathodal: "⊖"
+  region:
+    SNr: SNr
+    STN: STN
+    SNr-STN: "SNr–STN"
+    "SNr→STN": "SNr→STN"
+  bands:
+    delta: "δ"
+    theta: "θ"
+    alpha: "α"
+    beta_low: "low-β"
+    beta_high: "high-β"
+    gamma_low: "low-γ"
+    gamma_high: "high-γ"
+  y_axis:
+    aperiodic:
+      exponent: Aperiodic exponent
+      offset: Aperiodic offset
+      knee: Aperiodic knee
+    periodic:
+      default: "{Band} periodic power (dB)"
+    raw_power:
+      default: "{Band} total power (dB)"
+    burst:
+      mean: '$\log_{10}$ {Band} burst amplitude (V)'
+      duration: '$\log_{10}$ {Band} burst duration (s)'
+      rate: '$\operatorname{asinh}$ {Band} burst rate (Hz)'
+      occupancy: "{Band} burst occupancy (%)"
+    ciplv:
+      default: '$\operatorname{logit}$({Band} ciPLV)'
+    imcoh_abs:
+      default: '$z_{\mathrm{Fisher}}$({Band} |ImCoh|)'
+    wpli:
+      default: '$\operatorname{logit}$({Band} wPLI)'
+    psi:
+      default: "{Band} PSI"
+    trgc:
+      default: "{Band} TRGC"
+
+style:
+  phase_palette:
+    Pre: "#F2000E"
+    Early: "#0E6AAF"
+    Late: "#0CA228"
+    Post: "#E87000"
+  font:
+    latin: Arial Unicode MS
+    greek: Arial Unicode MS
+    axis_pt: 7
+    strip_pt: 7
+    bracket_pt: 7
+    tick_pt: 6
+    sample_size_pt: 6
+  line_width_pt:
+    default: 0.60
+    emm_line: 0.75
+    emm_ci: 1.00
+    box_edge: 0.65
+    median: 0.65
+    raw_mean: 0.65
+    whisker: 0.65
+    cap: 0.65
+    significance_bracket: 0.65
+  geometry_mm:
+    phase_width: 6
+    panel_height: 25
+    panel_gap: [3, 3]
+    strip_top_height: 4.5
+    strip_right_width: 4.5
+    strip_pad: 2
+    x_label_offset: 5
+    y_label_offset: 7
+  strips:
+    top_background: "#D7E3E0"
+    right_background: "#E3DCCF"
+    text_color: black
+    font_weight: bold
+  jitter:
+    width: 0.20
+    size: 2
+    alpha: 1
+    seed: 42
+  box:
+    width: 0.55
+    fill_alpha: 0.30
+    whiskers: tukey
+    outlier_marker_size: 0
+  emm:
+    color: black
+    line_style: "-"
+    mean_marker: "o"
+    mean_marker_size_pt: 2
+    mean_marker_edge_width_pt: 0
+    ci_cap_pt: 0
+  raw_mean:
+    color: "#404040"
+    line_style: "--"
+  y_limits:
+    lower_padding_fraction: 0.15
+    upper_padding_fraction: 0.30
+    share_within_figure: true
+  axes:
+    grid: false
+    show_top_right_spines: false
+    reference_lines: false
+  legend: false
+  transparent: true
+  dpi: 600
+
+sample_size:
+  show: true
+  id_column: ID
+  template: "{n_ID}"
+  color: "#2C2C2C"
+  y_axes: 0.00
+  vertical_alignment: bottom
+
+significance:
+  p_column: p_tukey
+  hide_non_significant: true
+  thresholds:
+    - p_lt: 0.001
+      label: "***"
+    - p_lt: 0.01
+      label: "**"
+    - p_lt: 0.05
+      label: "*"
+  bracket:
+    y_start: 0.50
+    y_end: 0.90
+    y_step: 0.08
+    height_fraction: 0
+    text_offset_fraction: -0.035
+
+outputs:
+  format: pdf
+  filename_template: "analysis-{AnalysisID}_test-{TestID}_figure-scalar.pdf"
+  inherit_stats_parent: true
+  formal_png: false
+  hashes: false
+
+manifests:
+  figures: figures.csv
+  coverage: coverage.csv
+
+execution:
+  on_error: fail
+  retry: false
+  cache: false
+  resume: false

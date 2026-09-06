@@ -1,0 +1,72 @@
+submission:
+  id: structural-connectivity
+
+configs:
+  structural: configs/structural_connectivity.yaml
+
+paths:
+  output_root: /path/to/results/submission/data/structural_connectivity
+  figure_root: /path/to/results/submission/data/structural_connectivity/contact_lmm
+
+publish:
+  root_tables:
+    - channel_lift.csv
+    - channel_field_weighted_lift.csv
+    - local_rows.csv
+    - connectivity_rows.csv
+    - subject_aggregates.csv
+    - correlations.csv
+    - inputs.csv
+    - outputs.csv
+    - cortical_allocation_regional_field.csv
+    - cortical_allocation_contact_model_rows.csv
+    - cortical_allocation_contact_pairing.csv
+    - cortical_allocation_outcome_sd.csv
+    - cortical_allocation_models.csv
+    - cortical_allocation_fixed_effects.csv
+    - cortical_allocation_joint_tests.csv
+    - cortical_allocation_phase_slopes.csv
+    - cortical_allocation_phase_slope_contrasts.csv
+    - cortical_allocation_prediction_grid.csv
+    - cortical_allocation_inputs.csv
+    - cortical_allocation_tests.csv
+    - cortical_allocation_outputs.csv
+    - tables.csv
+  contact_lmm_tables:
+    - lift_predictors.csv
+    - model_rows.csv
+    - models.csv
+    - model_fit.csv
+    - fixed_effects.csv
+    - omnibus_tests.csv
+    - phase_slopes.csv
+    - prediction_grid.csv
+    - outcome_sd.csv
+    - coverage.csv
+    - multiplicity_families.csv
+    - inputs.csv
+    - outputs.csv
+    - figures.csv
+    - tables.csv
+  contact_lmm_adjacent_tables:
+    - lift_predictors.csv
+    - model_rows.csv
+    - models.csv
+    - model_fit.csv
+    - fixed_effects.csv
+    - omnibus_tests.csv
+    - phase_slopes.csv
+    - prediction_grid.csv
+    - outcome_sd.csv
+    - coverage.csv
+    - multiplicity_families.csv
+    - inputs.csv
+    - outputs.csv
+    - figures.csv
+    - tables.csv
+
+execution:
+  on_error: fail
+  retry: false
+  cache: false
+  resume: false

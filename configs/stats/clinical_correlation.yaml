@@ -1,0 +1,127 @@
+analysis:
+  id: clinical-correlation
+  kind: clinical_correlation
+  question: Patient-level associations between normalized LFP delta metrics and clinical scale scores.
+
+paths:
+  clinical_workbook: /path/to/data/summary/cohort/subj/subject_effect_origin.xlsx
+  feature_manifest: /path/to/data/summary/table/manifest/feature_outputs_all.csv
+  lfp_root: /path/to/data/summary/table/aggregate/normalize/region
+  output_root: /path/to/data/summary/stats/clinical-correlation
+  manifest_root: /path/to/data/summary/stats/clinical-correlation/manifest
+
+inputs:
+  clinical:
+    sheet_name: Sheet1
+    columns:
+      id: ID
+      protocol: Protocol
+      phase: Phase
+      scale: Scale
+      value: Value
+      baseline: Baseline
+    phase: 3m
+    protocols: {stn: STN, stn_snr: STN+SNr}
+  lfp:
+    manifest_select:
+      Stage: aggregate_region
+      SourceStage: normalize
+      AggregationLevel: region
+      Representation: scalar
+    phases: [Early, Late, Post]
+    laterality: [Ipsi, Contra]
+    polarity: [Anodal, Cathodal]
+    include_aggregate: true
+    value_column: Value
+
+scales:
+  - {value: MDS-UPDRS III score, label: UPDRS-III, direction: lower_is_better}
+  - {value: MDS-UPDRS III axial score, label: UPDRS-III axial, direction: lower_is_better}
+  - {value: FOGQ score, label: FOG-Q, direction: lower_is_better}
+  - {value: PDQ39 score, label: PDQ-39, direction: lower_is_better}
+  - {value: KPPS score, label: KPPS, direction: lower_is_better}
+  - {value: MADRS score, label: MADRS, direction: lower_is_better}
+  - {value: ADL, label: ADL, direction: lower_is_better}
+  - {value: SE-ADL score (%), label: SE-ADL, direction: higher_is_better}
+  - {value: BDI score, label: BDI, direction: lower_is_better}
+  - {value: Bradykinesia subscore (Med OFF), label: Bradykinesia subscore (Med OFF), direction: lower_is_better}
+  - {value: CCCS, label: CCCS, direction: lower_is_better}
+  - {value: DSFS, label: DSFS, direction: lower_is_better}
+  - {value: EAT-10, label: EAT-10, direction: lower_is_better}
+  - {value: ESS, label: ESS, direction: lower_is_better}
+  - {value: FSS, label: FSS, direction: lower_is_better}
+  - {value: HAMA, label: HAMA, direction: lower_is_better}
+  - {value: HAMD, label: HAMD, direction: lower_is_better}
+  - {value: MAES, label: MAES, direction: lower_is_better}
+  - {value: MDS-UDPRS II, label: MDS-UPDRS II, direction: lower_is_better}
+  - {value: MDS-UPDRS I, label: MDS-UPDRS I, direction: lower_is_better}
+  - {value: MDS-UPDRS IV, label: MDS-UPDRS IV, direction: lower_is_better}
+  - {value: ODQ, label: ODQ, direction: lower_is_better}
+  - {value: RBDSQ, label: RBDSQ, direction: lower_is_better}
+  - {value: RBDSQ-HK, label: RBDSQ-HK, direction: lower_is_better}
+  - {value: Rigidity subscore (Med OFF), label: Rigidity subscore (Med OFF), direction: lower_is_better}
+  - {value: SCOPA-AUT, label: SCOPA-AUT, direction: lower_is_better}
+  - {value: SDQ, label: SDQ, direction: lower_is_better}
+  - {value: Tremor subscore (Med OFF), label: Tremor subscore (Med OFF), direction: lower_is_better}
+
+features:
+  bands:
+    - {value: delta, label: "δ"}
+    - {value: theta, label: "θ"}
+    - {value: alpha, label: "α"}
+    - {value: beta_low, label: "low-β"}
+    - {value: beta_high, label: "high-β"}
+    - {value: gamma_low, label: "low-γ"}
+    - {value: gamma_high, label: "high-γ"}
+  local:
+    region_column: Region
+    regions: [STN, SNr]
+    banded:
+      - {metric: periodic, feature_output: mean-scalar, label: Periodic power}
+      - {metric: raw_power, feature_output: mean-scalar, label: Total power}
+      - {metric: burst, feature_output: mean-scalar, label: Burst amplitude}
+      - {metric: burst, feature_output: duration-scalar, label: Burst duration}
+      - {metric: burst, feature_output: rate-scalar, label: Burst rate}
+      - {metric: burst, feature_output: occupancy-scalar, label: Burst occupancy}
+    aperiodic:
+      metric: aperiodic
+      feature_output: mean-scalar
+      parameters:
+        - {value: exponent, label: Exponent}
+        - {value: offset, label: Offset}
+  connectivity:
+    region_column: PairRegion
+    display_region: SNr-STN-combined
+    metrics:
+      - {metric: ciplv, feature_output: mean-scalar, source_region: SNr-STN, label: ciPLV}
+      - {metric: imcoh_abs, feature_output: mean-scalar, source_region: SNr-STN, label: "|ImCoh|"}
+      - {metric: wpli, feature_output: mean-scalar, source_region: SNr-STN, label: wPLI}
+      - {metric: psi, feature_output: mean-scalar, source_region: "SNr→STN", label: PSI}
+      - {metric: trgc, feature_output: mean-scalar, source_region: "SNr→STN", label: TRGC}
+
+endpoints:
+  - {id: preop, label: Preop, outcome_column: Baseline, method: spearman, covariates: [], minimum_n: 3}
+  - {id: stn-3m, label: STN 3m, outcome_column: STN3m, method: partial_spearman, covariates: [Baseline], minimum_n: 3}
+  - {id: stn-snr-3m, label: STN+SNr 3m, outcome_column: STNSNr3m, method: partial_spearman, covariates: [Baseline], minimum_n: 3}
+  - {id: incremental-3m, label: Incremental benefit 3m, outcome_column: IncrementalBenefit3m, method: partial_spearman, covariates: [Baseline], minimum_n: 3}
+
+inference:
+  alternative: two-sided
+  p_method: exhaustive_permutation
+  partial_permutation: freedman_lane
+  rank_method: average
+  significance_basis: p_holm
+  correction:
+    method: holm
+    family_fields: [EndpointID, Scale, Domain, RegionValue, Polar, Metric, FeatureOutput, Band]
+
+outputs:
+  clinical_endpoints: derived/clinical_endpoints.csv
+  fit_points: derived/correlation_fit_points.csv
+  correlations: results/correlations.csv
+
+manifests:
+  inputs: inputs.csv
+  outputs: outputs.csv
+
+execution: {on_error: fail, retry: false, cache: false, resume: false}

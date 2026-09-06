@@ -1,0 +1,80 @@
+visualization:
+  id: clinical-correlation-heatmap
+  kind: correlation_heatmap
+
+paths:
+  stats_root: /path/to/data/summary/stats/clinical-correlation
+  correlations: /path/to/data/summary/stats/clinical-correlation/results/correlations.csv
+  output_root: /path/to/data/summary/viz
+  manifest_root: /path/to/data/summary/viz/manifest/clinical-correlation-heatmap
+
+inputs:
+  stats_analysis_id: clinical-correlation
+  accepted_statuses: [ok, insufficient_n, constant_input]
+  value_column: rho
+  p_column: p_holm
+  retained_p_columns: [p_raw, p_holm]
+
+figures:
+  - {id: clinical-correlation-lat-split, test_id: clinical-correlation, layout: laterality_singletons, split_var: Lat, split_levels: [Ipsi, Contra]}
+  - {id: clinical-correlation-lat-faceted, test_id: clinical-correlation, layout: laterality_rows, row_var: Lat, row_levels: [Ipsi, Contra]}
+
+factor_levels:
+  Phase: [Early, Late, Post]
+  Lat: [Ipsi, Contra]
+  Polar: [Anodal, Cathodal]
+
+labels:
+  delta_prefix: "Δ"
+  polarity: {Anodal: "⊕", Cathodal: "⊖"}
+  region: {SNr: SNr, STN: STN, SNr-STN: "SNr–STN", "SNr→STN": "SNr→STN", SNr-STN-combined: "SNr→/-STN"}
+  colorbar:
+    preop: "Spearman's ρ (Preop)"
+    stn-3m: "Partial Spearman's ρ (STN, 3m)"
+    stn-snr-3m: "Partial Spearman's ρ (STN+SNr, 3m)"
+    incremental-3m: "Partial Spearman's ρ (STN+SNr vs STN increment, 3m)"
+
+style:
+  font: {family: Arial Unicode MS, strip_pt: 7, tick_pt: 6, colorbar_pt: 6, star_pt: 7}
+  geometry_mm:
+    cell_size: {matrix: [2.5, 2.5]}
+    panel_gap: {laterality_singletons: [0.0, 0.0], laterality_rows: [0.0, 3.0]}
+    strip_top_height: 4.5
+    strip_right_width: 4.5
+    strip_pad: 2.0
+    colorbar_width: 3.0
+    colorbar_pad: 2.0
+    colorbar_label_offset: 5.0
+  strips:
+    top_background: "#D7E3E0"
+    right_background: "#E3DCCF"
+    text_color: black
+    font_weight: bold
+  heatmap:
+    colormap: vik
+    value_mode: symmetric
+    value_limits: [-1.0, 1.0]
+    clip_display: false
+  grid: {color: black, width_pt: 0.60, alpha: 0.90}
+  significance:
+    basis: p_holm
+    hide_non_significant: true
+    text_color: white
+    thresholds:
+      - {p_lt: 0.001, label: "***"}
+      - {p_lt: 0.01, label: "**"}
+      - {p_lt: 0.05, label: "*"}
+  colorbar:
+    label: "Spearman's ρ"
+    ticks: [-1.0, 0.0, 1.0]
+  transparent: true
+  dpi: 600
+
+outputs:
+  format: pdf
+  filename_template: "analysis-{AnalysisID}_endpoint-{EndpointID}_domain-{Domain}_region-{RegionValue}_polar-{Polar}_phase-{Phase}_lat-{LatDisplay}_figure-correlation-heatmap.pdf"
+  formal_png: false
+  hashes: false
+
+manifests: {figures: figures.csv, cells: cells.csv}
+execution: {on_error: fail, retry: false, cache: false, resume: false}

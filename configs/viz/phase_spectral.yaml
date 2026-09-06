@@ -1,0 +1,113 @@
+visualization:
+  id: phase-spectral
+  kind: spectral
+
+paths:
+  table_root: /path/to/data/summary/table
+  feature_outputs_manifest: /path/to/data/summary/table/manifest/feature_outputs_all.csv
+  output_root: /path/to/data/summary/viz
+  manifest_root: /path/to/data/summary/viz/manifest/phase-spectral
+
+inputs:
+  stage: aggregate_region
+  source_stage: transform
+  aggregation_level: region
+  representation: spectral
+  row_filter:
+    IncludeAggregate: true
+    finite_nested_value: true
+  selectors:
+    local:
+      canonical_region: [SNr, STN]
+      polar: [Anodal, Cathodal]
+      features:
+        - {metric: periodic, feature_output: mean-spectral, bands: [All]}
+        - {metric: raw_power, feature_output: mean-spectral, bands: [All]}
+    connectivity:
+      canonical_region: [SNr-STN]
+      polar: [Anodal, Cathodal]
+      features:
+        - {metric: ciplv, feature_output: mean-spectral, bands: [All]}
+        - {metric: imcoh_abs, feature_output: mean-spectral, bands: [All]}
+        - {metric: wpli, feature_output: mean-spectral, bands: [All]}
+        - {metric: trgc, feature_output: mean-spectral, bands: [All], canonical_region: ["SNr→STN"]}
+
+figures:
+  - {id: Phase, layout: marginal, line_var: Phase}
+  - id: Phase-Lat
+    layout: laterality_rows
+    line_var: Phase
+    row_var: Lat
+    row_levels: [Ipsi, Contra]
+
+factor_levels:
+  Phase: [Pre, Early, Late, Post]
+  Lat: [Ipsi, Contra]
+
+labels:
+  polarity: {Anodal: "⊕", Cathodal: "⊖"}
+  region: {SNr: SNr, STN: STN, SNr-STN: "SNr–STN", "SNr→STN": "SNr→STN"}
+  value_axis:
+    periodic: "Periodic power (dB)"
+    raw_power: "Total power (dB)"
+    ciplv: '$\operatorname{logit}$(ciPLV)'
+    imcoh_abs: '$z_{\mathrm{Fisher}}$(|ImCoh|)'
+    wpli: '$\operatorname{logit}$(wPLI)'
+    trgc: TRGC
+
+style:
+  palette: ["#F2000E", "#0E6AAF", "#0CA228", "#E87000", "#884392"]
+  font: {family: Arial Unicode MS, axis_pt: 7, strip_pt: 7, tick_pt: 6, legend_pt: 6}
+  line_width_pt: {default: 0.60, mean: 1.00, boundary: 0.60}
+  geometry_mm:
+    panel_width: 30
+    panel_height: 25
+    panel_gap: [3, 3]
+    strip_top_height: 4.5
+    strip_right_width: 4.5
+    strip_pad: 2
+    x_label_offset: 5
+    y_label_offset: 7
+  strips:
+    top_background: "#D7E3E0"
+    right_background: "#E3DCCF"
+    text_color: black
+    font_weight: bold
+  ribbon: {kind: sem, alpha: 0.30}
+  axes:
+    x_label: "Frequency (Hz)"
+    x_limits: [2, 90]
+    x_log: true
+    y_log: false
+    grid: false
+    show_top_right_spines: false
+  frequency_boundaries: [4, 8, 13, 20, 35, 60]
+  boundary_line: {color: "#404040", style: ":", alpha: 0.60}
+  band_shadows:
+    - {start: 2, stop: 4, color: "#E5E5E540"}
+    - {start: 4, stop: 8, color: "#CCCCCC40"}
+    - {start: 8, stop: 13, color: "#B3B3B340"}
+    - {start: 13, stop: 20, color: "#9A9A9A40"}
+    - {start: 20, stop: 35, color: "#81818140"}
+    - {start: 35, stop: 60, color: "#68686840"}
+    - {start: 60, stop: 90, color: "#4F4F4F40"}
+  legend:
+    show: true
+    location: outside_right
+    frame: true
+    fancybox: true
+    frame_alpha: 0.90
+    face_color: white
+    edge_color: "#CCCCCC"
+    edge_width: 0.60
+  transparent: true
+  dpi: 600
+
+outputs:
+  format: pdf
+  filename_template: "analysis-{AnalysisID}_test-{TestID}_figure-spectral.pdf"
+  formal_png: false
+  hashes: false
+
+manifests: {figures: figures.csv, coverage: coverage.csv}
+execution: {on_error: fail, retry: false, cache: false, resume: false}
