@@ -1,0 +1,27 @@
+paths:
+  stats_root: /path/to/results/submission/data/clinical-correlation/lct
+  output_root: /path/to/results/submission/data/clinical-correlation/lct/prediction/raw-score
+  fit_style: configs/viz/submission_clinical_correlation_adjacent_phase_fit.yaml
+  heatmap_style: configs/viz/submission_clinical_correlation_scale_heatmap.yaml
+
+# Polar, Lat, RegionValue, Metric, FeatureOutput, Band; preserve requested order.
+fit_items:
+  - [Anodal, Contra, SNr, periodic, mean-scalar, gamma_high]
+  - [Anodal, Ipsi, SNr, aperiodic, mean-scalar, exponent]
+  - [Anodal, Ipsi, SNr, aperiodic, mean-scalar, offset]
+  - [Anodal, Ipsi, SNr, raw_power, mean-scalar, alpha]
+  - [Anodal, Ipsi, SNr, raw_power, mean-scalar, beta_low]
+  - [Anodal, Ipsi, SNr, raw_power, mean-scalar, delta]
+  - [Anodal, Ipsi, SNr, raw_power, mean-scalar, theta]
+  - [Anodal, Ipsi, SNr-STN, ciplv, mean-scalar, delta]
+  - [Anodal, Ipsi, SNr-STN, wpli, mean-scalar, delta]
+  - [Anodal, Ipsi, STN, burst, duration-scalar, beta_high]
+  - [Anodal, Ipsi, STN, raw_power, mean-scalar, beta_low]
+  - [Cathodal, Contra, "SNr→STN", psi, mean-scalar, theta]
+  - [Cathodal, Contra, STN, burst, mean-scalar, gamma_low]
+  - [Cathodal, Ipsi, SNr, burst, occupancy-scalar, gamma_high]
+  - [Cathodal, Ipsi, SNr, burst, rate-scalar, gamma_high]
+  - [Cathodal, Ipsi, SNr, raw_power, mean-scalar, gamma_high]
+  - [Cathodal, Ipsi, SNr-STN, ciplv, mean-scalar, theta]
+  - [Cathodal, Ipsi, SNr-STN, imcoh_abs, mean-scalar, theta]
+  - [Cathodal, Ipsi, SNr-STN, wpli, mean-scalar, theta]

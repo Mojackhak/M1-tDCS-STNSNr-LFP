@@ -30,7 +30,7 @@ LFP-TensorPipe configuration format versions.
 | `derivatives/lfptensorpipe/sub-*/tDCS_*/localize/channel_representative_coords.pkl` | Channel coordinates and STN/SNr membership flags. |
 | `derivatives/lfptensorpipe/sub-*/tDCS_*/tensor/<metric>/tensor.pkl` and `alignment/<trial>/warp_labels.pkl` | Native tensors and alignment timing for the response-profile baseline bootstrap. |
 | `summary/cohort/subj/subject_effect_origin.xlsx` | Clinical table: `ID`, `Protocol`, `Phase`, `Scale`, `Value`, `Baseline`. |
-| `summary/cohort/subj/structured/*.csv` | `programming_parameters.csv`, `baseline_covariates.csv`, `tdcs_execution_status.csv`, `contact_pair_regions.csv`; column contracts are in `lfp_clinical/programming.py`. |
+| `summary/cohort/subj/structured/*.csv` | `programming_parameters.csv`, `baseline_covariates.csv`, `tdcs_execution_status.csv`, `contact_pair_regions.csv`; column selections are in `lfp_clinical/programming.py` and `cohort_tables.py`. |
 | `summary/cohort/lead/lead_coords.csv` | Right-normalized coordinates and `Region` for the lead-coordinate view. |
 
 Cohort CSVs are read directly; they do not replace nested LFP feature PKLs.
@@ -114,11 +114,46 @@ extraction, run `contact-lmm-adjacent`, then
 are listed by this command's `--help` and `pipeline.structural_simnibs --help`.
 Use fresh output directories or explicitly request replacement where supported.
 
-## Manuscript figures
+## LCT associations, prediction, and cohort tables
 
-This mapping follows the current 32 manuscript panel YAMLs: Figures 1–8 and
-Supplementary Figures 1–24. Private source-image paths are omitted.
-Configuration names below are relative to `configs/viz/`.
+The adjacent-phase clinical workflow first exports `clinical_endpoints.csv` and
+`adjacent_phase_predictors.csv`. LCT analyses join these with
+`baseline_covariates.csv`, including `LCT_ImprovementPercent`. Partial associations
+control for Baseline and LCT; each covariate is ranked separately. Prediction uses
+leave-one-participant-out OLS with matched complete cases across compared models.
+Baseline-only and LCT reference panels are shared only for identical endpoint,
+scale, model, and participant membership. The renderers reuse the clinical fit
+style and its participant colors.
+
+```bash
+python -B -m lfp_clinical.lct_runner --config configs/stats/clinical_correlation_lct.yaml
+python -B -m lfp_clinical.lct_prediction --config configs/stats/clinical_correlation_lct.yaml
+python -B -m lfp_clinical.lct_prediction --config configs/stats/clinical_correlation_lct.yaml --baseline-only
+python -B -m lfp_viz.lct_preview --config configs/viz/clinical_correlation_lct.yaml --all
+python -B -m lfp_viz.lct_prediction_figures --config configs/viz/clinical_prediction.yaml
+python -B -m lfp_viz.phase_contact_trajectories --stats-config configs/stats/phase_by_lat_contact_paired.yaml --profiles /path/to/results/submission/data/Phase/response_profiles/profiles.csv --output-root /path/to/results/contact_paired_trajectories
+python -B -m lfp_clinical.cohort_tables --cohort-root /path/to/data/summary/cohort/subj/structured --output-root /path/to/results/cohort_tables
+```
+
+The contact trajectory renderer rebuilds paired model inputs using the existing
+stats planner, selects significant Ipsi models from `profiles.csv`, and preserves
+Pre, Early, Late, and Post observations without refitting models. It does not
+require temporary LOSO outputs. Cohort table export reads the four structured
+CSVs listed below and writes five CSV tables and a matching XLSX workbook.
+Missing programming entries remain missing. All runtime identifiers and outputs
+belong in private data/results directories.
+
+Rerun LCT associations and predictions when their endpoint, predictor, or LCT
+inputs change; rerender their downstream panels after corresponding results
+change. Trajectories depend on paired feature inputs, the Phase configuration,
+and the selected profiles. Cohort tables depend only on their corresponding CSV.
+Display changes require rendering only. No global invalidation is introduced.
+
+## Manuscript figures and tables
+
+This mapping follows 54 panel YAMLs (153 panels): Figures 1–8 and Supplementary
+Figures 1–46. Private source-image paths are omitted. Configuration names below
+are relative to `configs/viz/`. Final artwork assembly remains external.
 
 | Figure/panels | Rendering source |
 |---|---|
@@ -127,16 +162,30 @@ Configuration names below are relative to `configs/viz/`.
 | 3a | `lfp_viz/phase_response_schematic.py`. |
 | 3b | `lfp_stats/phase_response_bootstrap.py` and `lfp_viz/phase_response_profiles.py`. |
 | 4a–f | `submission_polar_trajectory.yaml`; `lfp_viz/lat_trajectory.py`. |
-| 4g–j | `submission_lat_trajectory.yaml`; `lfp_viz/lat_trajectory.py`. Panel h: Anodal STN high-beta periodic power; panel i: Cathodal SNr high-beta periodic power. |
-| 6a–b; S11d–g | Structural atlas-grid fits: `lfp_structural/contact_lmm_adjacent.py` and `contact_lmm.py`. |
-| 7a–f | `submission_clinical_correlation_adjacent_phase_fit.yaml`; `lfp_viz/correlation_fit.py`. |
+| 4g–j | `submission_lat_trajectory.yaml`; panel h: Anodal STN high-beta periodic power; panel i: Cathodal SNr high-beta periodic power. |
+| 6a–b; S12d–g | Structural atlas-grid fits: `lfp_structural/contact_lmm_adjacent.py` and `contact_lmm.py`. |
+| 7a–b,d; S38b–d | `submission_clinical_correlation_adjacent_phase_fit.yaml`; `lfp_viz/correlation_fit.py`. |
+| 7c; S19a–d; S38a | `clinical_correlation_lct.yaml`; `lfp_viz/lct_preview.py`. |
+| 7e–l; S38e–l; S39a–h | `clinical_prediction.yaml`; `lfp_viz/lct_prediction_figures.py`, using `lct_prediction_preview.py` rendering helpers. |
 | 8a–b | `lfp_programming_intensity_contact_matched.yaml`; `lfp_viz/programming.py`. |
 | S1–S3 | `submission_phase_contact_scalar_heatmap.yaml`; `lfp_viz/heatmap.py`. |
-| S5 | `submission_polar_contact_scalar_heatmap.yaml`. |
-| S6 | `submission_lat_region_scalar_heatmap.yaml`. |
-| S7–S10 | Structural atlas heatmaps: `contact-lmm-adjacent-field-excess-heatmaps` stage. |
-| S11a–c | `submission_phase_contact_scalar.yaml`. |
-| S12–S17 | `submission_clinical_correlation_scale_heatmap.yaml`; `lfp_viz/correlation_heatmap.py`, using the adjacent-phase clinical analysis. |
-| S18–S23 | `lfp_programming_intensity_contact_matched.yaml`; unadjusted, UPDRS-III adjusted, and PDQ-39 adjusted local/connectivity heatmaps. |
-| S24a–d | Adjusted fits and jitter panels from the same programming configuration. |
-| 1a–b; 5a; 8c | Study/anatomy diagrams and structural QC composites assembled with external software. Their final artwork is outside the Python rendering commands. |
+| S5a–p | `lfp_viz/phase_contact_trajectories.py`; paired observations for significant Ipsi profiles. |
+| S6 | `submission_polar_contact_scalar_heatmap.yaml`. |
+| S7 | `submission_lat_region_scalar_heatmap.yaml`. |
+| S8–S11 | Structural atlas heatmaps: `contact-lmm-adjacent-field-excess-heatmaps` stage. |
+| S12a–c | `submission_phase_contact_scalar.yaml`. |
+| S13–S18 | `submission_clinical_correlation_scale_heatmap.yaml`; adjacent-phase clinical heatmaps. |
+| S20–S25 | `clinical_correlation_lct.yaml`; LCT-adjusted association heatmaps. |
+| S26–S31 | `clinical_prediction.yaml`; UPDRS-III MAE reduction versus Baseline (S26–S28) and LCT (S29–S31), for SNr, STN, and connectivity. |
+| S32–S37 | The corresponding PDQ-39 MAE reduction heatmaps versus Baseline (S32–S34) and LCT (S35–S37). |
+| S40–S45 | `lfp_programming_intensity_contact_matched.yaml`; unadjusted, UPDRS-III adjusted, and PDQ-39 adjusted local/connectivity heatmaps. |
+| S46a–d | Adjusted fits and jitter panels from the same programming configuration. |
+| 1a–b; 5a; 8c | Study/anatomy diagrams and structural QC composites assembled with external software. |
+
+| Supplementary table | Input to `lfp_clinical/cohort_tables.py` |
+|---|---|
+| 1 | `baseline_covariates.csv`: age, sex, disease duration, Med-OFF UPDRS-III, PDQ-39. |
+| 2 | `tdcs_execution_status.csv`: stimulation side and completion by polarity. |
+| 3 | `contact_pair_regions.csv`: region by bipolar contact pair and lead side. |
+| 4 | `programming_parameters.csv`: STN protocol settings. |
+| 5 | `programming_parameters.csv`: STN+SNr protocol settings. |

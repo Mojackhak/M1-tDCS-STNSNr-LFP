@@ -94,6 +94,7 @@ def _raw_linear_model_curve(
     y_column: str,
     baseline_reference: float | None,
     confidence_level: float,
+    additional_covariates: tuple[str, ...] = (),
 ) -> pd.DataFrame:
     """Fit the descriptive raw-space model and return its mean confidence band."""
 
@@ -107,12 +108,14 @@ def _raw_linear_model_curve(
         if baseline_reference is None:
             raise ValueError("Partial fit requires a Baseline reference.")
         baseline = points["Baseline"].to_numpy(dtype=float)
-        design = np.column_stack((np.ones(len(points)), x_values, baseline))
+        extra = [points[column].to_numpy(dtype=float) for column in additional_covariates]
+        design = np.column_stack((np.ones(len(points)), x_values, baseline, *extra))
         grid_design = np.column_stack(
             (
                 np.ones(len(x_grid)),
                 x_grid,
                 np.full(len(x_grid), baseline_reference),
+                *[np.full(len(x_grid), np.median(values)) for values in extra],
             )
         )
     else:
@@ -327,6 +330,8 @@ def render_correlation_fit_figure(
     points: pd.DataFrame,
     figure: Mapping[str, Any],
     config: VizConfig,
+    *,
+    prepared_curve: pd.DataFrame | None = None,
 ):
     """Render one correlation fit through the shared visualdf fit backbone."""
 
@@ -341,7 +346,7 @@ def render_correlation_fit_figure(
         if str(figure["Method"]) == "partial_spearman"
         else None
     )
-    curve = _raw_linear_model_curve(
+    curve = prepared_curve.copy() if prepared_curve is not None else _raw_linear_model_curve(
         points,
         method=str(figure["Method"]),
         x_column=x_column,

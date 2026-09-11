@@ -92,7 +92,7 @@ def _ordinary_group(
 def _partial_group_details(
     x: np.ndarray, y: np.ndarray, baseline: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    baseline_rank = rankdata(baseline, method="average").astype(float)
+    baseline_rank = rankdata(baseline, axis=0, method="average").astype(float)
     design = np.column_stack((np.ones(len(baseline_rank)), baseline_rank))
     residualizer = np.eye(len(baseline_rank)) - design @ np.linalg.pinv(design)
 
