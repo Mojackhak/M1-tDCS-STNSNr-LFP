@@ -1,0 +1,14 @@
+# Only the LFP selection, registry, and source paths are reused from this file.
+lfp_config: clinical_correlation_adjacent_phase.yaml
+strategy: region
+
+paths:
+  programming_parameters: /path/to/data/summary/cohort/subj/structured/programming_parameters.csv
+  baseline_covariates: /path/to/data/summary/cohort/subj/structured/baseline_covariates.csv
+  tdcs_execution_status: /path/to/data/summary/cohort/subj/structured/tdcs_execution_status.csv
+  output_root: /path/to/data/summary/stats/lfp-programming-intensity/region
+
+jitter:
+  cv: [0.0, 0.1, 0.2, 0.3, 0.5]
+  iterations: 10000
+  seed: 20260903

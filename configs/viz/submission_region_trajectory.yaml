@@ -1,0 +1,173 @@
+visualization:
+  id: submission-region-trajectory
+  kind: region_trajectory
+
+paths:
+  source_root: /path/to/data/summary/stats/derived/region-by-phase-lat
+  stats_root: /path/to/results/submission/data/region
+  statistics: /path/to/results/submission/data/region/statistics.csv
+  pairing: /path/to/results/submission/data/region/pairing.csv
+  runtime_root: /path/to/data/tmp/region/trajectory
+  output_root: /path/to/results/submission/data/region/trajectory
+  manifest_root: /path/to/results/submission/data/region/trajectory
+
+inputs:
+  stats_analysis_id: region-by-phase-lat
+  accepted_model_statuses: [ok, singular, convergence_warning]
+  selection: {column: p_holm, operator: lt, value: 0.05}
+  fit_phases: [Early, Late, Post]
+  anchor_phase: Pre
+  anchor_pair_columns: [ID, Record, Trial, Polar, Phase, Lat, Band]
+  component_columns: {SNr: SNrValue, STN: STNValue}
+  component_difference: {minuend: SNr, subtrahend: STN}
+  difference_tolerance: 1.0e-5
+  source_strata_fields: [Polar]
+  figure_condition_fields: [Polar, Lat]
+  row_filter:
+    IncludeAggregate: true
+    finite_columns: [SNrValue, STNValue]
+
+figures:
+  - id: Phase-Region-overlay
+    test_id: Phase
+    layout: region_overlay
+    x_var: Phase
+    line_var: Region
+    condition_vars: [Polar, Lat]
+
+factor_levels:
+  Phase: [Pre, Early, Late, Post]
+  Lat: [Ipsi, Contra]
+  Region: [SNr, STN]
+
+model:
+  formula: "Value ~ Phase * Lat * Region + (1 | ComponentPairID) + (1 | ID) + (0 + ComponentContrast | ID)"
+  factor_columns: [ID]
+  emmeans: {x_var: Phase, panel_var: Region, facet_var: Lat}
+  reml: true
+  df_method: kenward-roger
+  confidence_level: 0.95
+
+labels:
+  polarity: {Anodal: "⊕", Cathodal: "⊖"}
+  region:
+    SNr: SNr
+    STN: STN
+    SNr-minus-STN: "SNr−STN"
+    SNr-STN: "SNr–STN"
+    "SNr→STN": "SNr→STN"
+  bands:
+    delta: "δ"
+    theta: "θ"
+    alpha: "α"
+    beta_low: "low-β"
+    beta_high: "high-β"
+    gamma_low: "low-γ"
+    gamma_high: "high-γ"
+  delta_prefix: "Δ "
+  y_axis:
+    aperiodic:
+      exponent: Aperiodic exponent
+      offset: Aperiodic offset
+      knee: Aperiodic knee
+    periodic:
+      default: "{Band} periodic power (dB)"
+    raw_power:
+      default: "{Band} total power (dB)"
+    burst:
+      mean: '$\log_{10}$ {Band} burst amplitude (V)'
+      duration: '$\log_{10}$ {Band} burst duration (s)'
+      rate: '$\operatorname{asinh}$ {Band} burst rate (Hz)'
+      occupancy: "{Band} burst occupancy (%)"
+    ciplv:
+      default: '$\operatorname{logit}$({Band} ciPLV)'
+    imcoh_abs:
+      default: '$z_{\mathrm{Fisher}}$({Band} |ImCoh|)'
+    wpli:
+      default: '$\operatorname{logit}$({Band} wPLI)'
+    psi:
+      default: "{Band} PSI"
+    trgc:
+      default: "{Band} TRGC"
+
+style:
+  font:
+    latin: Arial Unicode MS
+    greek: Arial Unicode MS
+    axis_pt: 7
+    strip_pt: 7
+    legend_pt: 6
+    significance_pt: 7
+    tick_pt: 6
+  line_width_pt:
+    default: 0.60
+    emm_line: 0.75
+    emm_ci: 1.00
+  series:
+    order: [SNr, STN]
+    SNr: {color: "#F2000E", line_style: "-", zorder: 4}
+    STN: {color: "#0E6AAF", line_style: "-", zorder: 8}
+    mean_marker: o
+    mean_marker_size_pt: 2
+    mean_marker_edge_width_pt: 0
+    ci_cap_pt: 2
+  geometry_mm:
+    phase_width: 6
+    panel_height: 25
+    strip_top_height: 4.5
+    strip_pad: 2
+    x_label_offset: 5
+    y_label_offset: 7
+  strips:
+    top_background: "#D7E3E0"
+    text_color: black
+    font_weight: bold
+  y_limits:
+    lower_padding_fraction: 0.15
+    upper_padding_fraction: 0.30
+  axes:
+    grid: false
+    show_top_right_spines: false
+  legend:
+    location: outside_right
+    frame: false
+    order: [SNr, STN]
+  transparent: true
+  dpi: 600
+
+significance:
+  p_column: p_holm
+  hide_non_significant: true
+  thresholds:
+    - {p_lt: 0.001, label: "***"}
+    - {p_lt: 0.01, label: "**"}
+    - {p_lt: 0.05, label: "*"}
+  star_offset_fraction: 0.07
+
+reference_line:
+  value: 0
+  color: "#9A9A9A"
+  line_style: ":"
+  line_width_pt: 0.60
+  alpha: 0.80
+  zorder: 2
+
+outputs:
+  format: pdf
+  directory_fields: [OutputGroup]
+  filename_template: "{Band}_{Polar}_{Lat}_SNr-STN.pdf"
+  formal_png: false
+  hashes: false
+
+manifests:
+  figures: figures.csv
+  coverage: coverage.csv
+  emmeans: emmeans.csv
+  statistics: statistics.csv
+  model_fit: model-fit.csv
+
+execution:
+  on_error: fail
+  retry: false
+  cache: false
+  resume: false

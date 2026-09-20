@@ -1,0 +1,215 @@
+visualization:
+  id: submission-region-scalar
+  kind: scalar
+
+paths:
+  source_root: /path/to/data/summary/stats/derived/region-by-phase-lat
+  stats_root: /path/to/data/summary/stats
+  models_manifest: /path/to/data/summary/stats/manifest/region-by-phase-lat/models.csv
+  tests_manifest: /path/to/data/summary/stats/manifest/region-by-phase-lat/tests.csv
+  stats_outputs_manifest: /path/to/data/summary/stats/manifest/region-by-phase-lat/outputs.csv
+  derived_tables_manifest: /path/to/data/summary/stats/manifest/region-by-phase-lat/derived_tables.csv
+  output_root: /path/to/results/submission/data/region/scalar
+  manifest_root: /path/to/results/submission/data/region/scalar
+
+inputs:
+  stats_analysis_id: region-by-phase-lat
+  observation_level: region
+  accepted_model_statuses: [ok, singular, convergence_warning]
+  test_kind: emmean_vs_null
+  row_filter:
+    IncludeAggregate: true
+    finite_columns: [Value]
+
+figures:
+  - id: Phase-Lat-split
+    test_id: Phase-Lat
+    layout: laterality_singletons
+    x_var: Phase
+    split_var: Lat
+    split_levels: [Ipsi, Contra]
+
+  - id: Phase-Lat-faceted
+    test_id: Phase-Lat
+    layout: laterality_rows
+    x_var: Phase
+    row_var: Lat
+    row_levels: [Ipsi, Contra]
+
+factor_levels:
+  Phase: [Early, Late, Post]
+  Lat: [Ipsi, Contra]
+
+labels:
+  polarity:
+    Anodal: "⊕"
+    Cathodal: "⊖"
+  contrast:
+    SNr-minus-STN: "SNr−STN"
+  region:
+    SNr: SNr
+    STN: STN
+    SNr-minus-STN: "SNr−STN"
+    SNr-STN: "SNr–STN"
+    "SNr→STN": "SNr→STN"
+  bands:
+    delta: "δ"
+    theta: "θ"
+    alpha: "α"
+    beta_low: "low-β"
+    beta_high: "high-β"
+    gamma_low: "low-γ"
+    gamma_high: "high-γ"
+  y_axis:
+    aperiodic:
+      exponent: "ΔAperiodic exponent: SNr − STN"
+      offset: "ΔAperiodic offset: SNr − STN"
+      knee: "ΔAperiodic knee: SNr − STN"
+    periodic:
+      default: "Δ{Band} periodic power (dB): SNr − STN"
+    raw_power:
+      default: "Δ{Band} total power (dB): SNr − STN"
+    burst:
+      mean: '$\log_{10}$ Δ{Band} burst amplitude (V): SNr − STN'
+      duration: '$\log_{10}$ Δ{Band} burst duration (s): SNr − STN'
+      rate: '$\operatorname{asinh}$ Δ{Band} burst rate (Hz): SNr − STN'
+      occupancy: "Δ{Band} burst occupancy (%): SNr − STN"
+    ciplv:
+      default: '$\operatorname{logit}$(Δ{Band} ciPLV): SNr − STN'
+    imcoh_abs:
+      default: '$z_{\mathrm{Fisher}}$(Δ{Band} |ImCoh|): SNr − STN'
+    wpli:
+      default: '$\operatorname{logit}$(Δ{Band} wPLI): SNr − STN'
+    psi:
+      default: "Δ{Band} PSI: SNr − STN"
+    trgc:
+      default: "Δ{Band} TRGC: SNr − STN"
+
+style:
+  phase_palette:
+    Early: "#0E6AAF"
+    Late: "#0CA228"
+    Post: "#E87000"
+  font:
+    latin: Arial Unicode MS
+    greek: Arial Unicode MS
+    axis_pt: 7
+    strip_pt: 7
+    bracket_pt: 7
+    tick_pt: 6
+    sample_size_pt: 6
+  line_width_pt:
+    default: 0.60
+    emm_line: 0.75
+    emm_ci: 1.00
+    box_edge: 0.65
+    median: 0.65
+    raw_mean: 0.65
+    whisker: 0.65
+    cap: 0.65
+    significance_bracket: 0.65
+  geometry_mm:
+    phase_width: 6
+    panel_height: 25
+    panel_gap: [3, 3]
+    strip_top_height: 4.5
+    strip_right_width: 4.5
+    strip_pad: 2
+    x_label_offset: 5
+    y_label_offset: 7
+  strips:
+    top_background: "#D7E3E0"
+    right_background: "#E3DCCF"
+    text_color: black
+    font_weight: bold
+  jitter:
+    width: 0.20
+    size: 2
+    alpha: 1
+    seed: 42
+  box:
+    width: 0.55
+    fill_alpha: 0.30
+    whiskers: tukey
+    outlier_marker_size: 0
+  emm:
+    color: black
+    line_style: "-"
+    mean_marker: "o"
+    mean_marker_size_pt: 2
+    mean_marker_edge_width_pt: 0
+    ci_cap_pt: 0
+  raw_mean:
+    color: "#404040"
+    line_style: "--"
+  y_limits:
+    lower_padding_fraction: 0.15
+    upper_padding_fraction: 0.30
+    share_within_figure: true
+    share_across_lat_layouts: true
+  axes:
+    grid: false
+    show_top_right_spines: false
+    reference_lines: true
+  legend: false
+  transparent: true
+  dpi: 600
+
+sample_size:
+  show: true
+  id_column: ID
+  template: "{n_ID}"
+  color: "#2C2C2C"
+  y_axes: 0.00
+  vertical_alignment: bottom
+
+significance:
+  mode: emmean_vs_null
+  p_column: p_holm
+  hide_non_significant: true
+  marker_offset_fraction: 0.035
+  thresholds:
+    - {p_lt: 0.001, label: "***"}
+    - {p_lt: 0.01, label: "**"}
+    - {p_lt: 0.05, label: "*"}
+
+reference_line:
+  value: 0
+  color: "#9A9A9A"
+  line_style: ":"
+  line_width_pt: 0.60
+  alpha: 0.80
+  zorder: 8
+
+statistics:
+  enabled: true
+  p_column: p_holm
+  significance_alpha: 0.05
+  files:
+    models: models.csv
+    tests: tests.csv
+    model_fit: model-fit.csv
+    omnibus: omnibus.csv
+    emmeans: emmeans.csv
+    null_test: statistics.csv
+    significant_raw: significant-raw.csv
+    significant_holm: significant-holm.csv
+    pairing: pairing.csv
+
+outputs:
+  format: pdf
+  directory_fields: [OutputGroup]
+  filename_template: "{Band}_{RegionValue}_{Polar}_{LatDisplay}.pdf"
+  formal_png: false
+  hashes: false
+
+manifests:
+  figures: figures.csv
+  coverage: coverage.csv
+  statistics: tables.csv
+
+execution:
+  on_error: fail
+  retry: false
+  cache: false
+  resume: false

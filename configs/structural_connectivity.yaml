@@ -1,0 +1,293 @@
+analysis:
+  id: structural-connectivity
+
+paths:
+  leaddbs_root: /path/to/leaddbs
+  sextant_python_root: /path/to/Sextant-DBS/sextant/python
+  leaddbs_derivatives_root: /path/to/data/derivatives/leaddbs
+  lfptensorpipe_root: /path/to/data/derivatives/lfptensorpipe
+  derivative_root: /path/to/data/derivatives/structural_connectivity
+  summary_root: /path/to/data/summary/structural_connectivity
+  mni_reference: /path/to/leaddbs/templates/space/MNI152NLin2009bAsym/t1.nii
+  region_atlas_root: /path/to/leaddbs/templates/space/MNI152NLin2009bAsym/atlases/Custom_Ewert_Zhang_Middlebrooks
+  cortical_region_atlas_root: /path/to/leaddbs/templates/space/MNI152NLin2009bAsym/atlases/STNSNrplus-connected regions
+  local_lfp: /path/to/data/summary/table/aggregate/normalize/contact/local/periodic/mean-scalar.pkl
+  connectivity_lfp_root: /path/to/data/summary/table/aggregate/normalize/contact/connectivity
+  contact_lmm_temp_root: /path/to/data/tmp/structural-connectivity/contact-lmm
+  contact_lmm_adjacent_temp_root: /path/to/data/tmp/structural-connectivity/contact-lmm-adjacent
+  contact_lmm_adjacent_id_random_intercept_temp_root: /path/to/data/tmp/structural-connectivity/contact-lmm-adjacent-id-random-intercept
+  cortical_allocation_lmm_temp_root: /path/to/data/tmp/structural-connectivity/cortical-allocation-lmm
+  cortical_allocation_lmm_adjacent_temp_root: /path/to/data/tmp/structural-connectivity/cortical-allocation-lmm-adjacent
+
+subjects:
+  # Fictional example only; provide the actual roster in a private config.
+  - id: sub-example
+    stimulation_side: L
+    acquisition: ax
+    normalization_approval: 1.0
+
+connectomes:
+  - id: individualized_dti
+    representation: tck
+  - id: ppmi_85_ewert_2017
+    representation: leaddbs_hdf5
+    path: /path/to/leaddbs/connectomes/dMRI/PPMI 85 (Ewert 2017)/data.mat
+  - id: mgh_usc_hcp_32_horn_2017
+    representation: leaddbs_hdf5
+    path: /path/to/leaddbs/connectomes/dMRI/MGH-USC HCP 32 (Horn 2017)/data.mat
+  - id: dtor_985_full_elias_2024
+    representation: leaddbs_hdf5
+    path: /path/to/leaddbs/connectomes/dMRI/dTOR-985 Full (Elias 2024)/data.mat
+
+montages:
+  L:
+    electrodes: [C3, FC1, FC5, CP1, CP5]
+  R:
+    electrodes: [C4, FC2, FC6, CP2, CP6]
+  anode_centered_currents_a: [0.002, -0.0005, -0.0005, -0.0005, -0.0005]
+  cathode_centered_currents_a: [-0.002, 0.0005, 0.0005, 0.0005, 0.0005]
+  electrode:
+    definition: plane
+    shape: ellipse
+    dimensions_mm: [20.0, 20.0]
+    thickness_mm: 3.0
+    conductivity_s_per_m: 4.0
+
+masks:
+  contact_radius_mm: 2.4
+  region_probability_threshold: 0.05
+  field_threshold_v_per_m: 0.10
+  descriptive_ahm_quantile: 0.999
+  descriptive_ahm_fraction: 0.5
+  intersection: any_segment_occupied_voxel
+
+outcomes:
+  phases: [Early, Late, Post]
+  bands: [delta, theta, alpha, beta_low, beta_high, gamma_low, gamma_high]
+  polarities: [Anodal, Cathodal]
+  laterality: Ipsi
+  local_metrics: [periodic]
+  connectivity_metrics: [ciplv, imcoh_abs, psi, trgc, wpli]
+  connectivity_pair_regions:
+    ciplv: SNr-STN
+    imcoh_abs: SNr-STN
+    psi: SNr→STN
+    trgc: SNr→STN
+    wpli: SNr-STN
+  connectivity_scales:
+    ciplv: logit_pre_centered
+    imcoh_abs: fisher_z_pre_centered
+    psi: native_pre_centered
+    trgc: native_pre_centered
+    wpli: logit_pre_centered
+  local_scales:
+    periodic: db_pre_centered
+
+inference:
+  analysis_levels: [subject_aggregated, row_unaggregated]
+  lift_metrics: [BinaryLift, FieldWeightedLift]
+  minimum_n: 3
+  subject_method: exhaustive_exact_spearman_two_sided
+  row_method: asymptotic_spearman_two_sided
+  bh_planned_tests: 21
+  alpha: 0.05
+  connectivity_lift_predictors: [STN, SNr, RegionMean]
+  contact_lmm:
+    formula: "Value ~ Phase * X_z + (1 | ID) + (1 | ID:ContactUnitID)"
+    predictor_metrics: [BinaryLift, FieldWeightedLift, FieldExcess, SeedFieldExposure]
+    minimum_n: 3
+    phase_levels: [Early, Late, Post]
+    reml: true
+    degrees_of_freedom: kenward-roger
+    slope_p_adjust: holm
+    phase_slope_contrasts: false
+    prediction_quantiles: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    display_limit: 1.0
+    visualization:
+      backbone: lfp_viz.visualdf
+      phase_scalar_style_config: configs/viz/submission_phase_contact_scalar.yaml
+      phase_heatmap_style_config: configs/viz/submission_phase_contact_scalar_heatmap.yaml
+      slope_panel_width_mm: 30.0
+      connectome_labels:
+        individualized_dti: individualized DTI
+        ppmi_85_ewert_2017: PPMI
+        mgh_usc_hcp_32_horn_2017: HCP32
+        dtor_985_full_elias_2024: dTOR985
+      lift_metric_labels:
+        BinaryLift: Binary Lift
+        FieldWeightedLift: Field-weighted Lift
+        FieldExcess: Field excess (S - R)
+        SeedFieldExposure: Seed field exposure (S)
+      lift_predictor_labels:
+        STN: STN
+        SNr: SNr
+        RegionMean: Region mean
+  contact_lmm_adjacent:
+    analysis_id: structural-connectivity-contact-lmm-adjacent-phase
+    outcome_change_basis: adjacent_phase
+    previous_phases:
+      Early: Pre
+      Late: Early
+      Post: Late
+    formula: "Value ~ Phase * X_z + (1 | ID) + (1 | ID:ContactUnitID)"
+    predictor_metrics: [FieldWeightedLift, FieldExcess, SeedFieldExposure]
+    field_excess_local_outcomes: &adjacent_additional_local_outcomes
+      - metric: raw_power
+        feature_output: mean-scalar
+        path: /path/to/data/summary/table/aggregate/normalize/contact/local/raw_power/mean-scalar.pkl
+        transform: dB
+        transform_policy_status: matched
+        outcome_scale: db_pre_centered
+        bands: [delta, theta, alpha, beta_low, beta_high, gamma_low, gamma_high]
+      - metric: burst
+        feature_output: mean-scalar
+        path: /path/to/data/summary/table/aggregate/normalize/contact/local/burst/mean-scalar.pkl
+        transform: log10
+        transform_policy_status: matched
+        outcome_scale: log10_pre_centered
+        bands: [delta, theta, alpha, beta_low, beta_high, gamma_low, gamma_high]
+      - metric: burst
+        feature_output: duration-scalar
+        path: /path/to/data/summary/table/aggregate/normalize/contact/local/burst/duration-scalar.pkl
+        transform: log10
+        transform_policy_status: configured_override
+        outcome_scale: log10_pre_centered
+        bands: [delta, theta, alpha, beta_low, beta_high, gamma_low, gamma_high]
+      - metric: burst
+        feature_output: rate-scalar
+        path: /path/to/data/summary/table/aggregate/normalize/contact/local/burst/rate-scalar.pkl
+        transform: asinh
+        transform_policy_status: configured_override
+        outcome_scale: asinh_pre_centered
+        bands: [delta, theta, alpha, beta_low, beta_high, gamma_low, gamma_high]
+      - metric: burst
+        feature_output: occupancy-scalar
+        path: /path/to/data/summary/table/aggregate/normalize/contact/local/burst/occupancy-scalar.pkl
+        transform: none
+        transform_policy_status: matched
+        outcome_scale: native_pre_centered
+        bands: [delta, theta, alpha, beta_low, beta_high, gamma_low, gamma_high]
+      - metric: aperiodic
+        feature_output: mean-scalar
+        path: /path/to/data/summary/table/aggregate/normalize/contact/local/aperiodic/mean-scalar.pkl
+        transform: none
+        transform_policy_status: matched
+        outcome_scale: native_pre_centered
+        bands: [exponent, offset]
+    minimum_n: 3
+    phase_levels: [Early, Late, Post]
+    reml: true
+    degrees_of_freedom: kenward-roger
+    slope_p_adjust: holm
+    phase_slope_contrasts: false
+    prediction_quantiles: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    display_limit: 1.0
+    visualization:
+      backbone: lfp_viz.visualdf
+      phase_scalar_style_config: configs/viz/submission_phase_contact_scalar.yaml
+      phase_heatmap_style_config: configs/viz/submission_phase_contact_scalar_heatmap.yaml
+      slope_panel_width_mm: 30.0
+      connectome_labels:
+        individualized_dti: individualized DTI
+        ppmi_85_ewert_2017: PPMI
+        mgh_usc_hcp_32_horn_2017: HCP32
+        dtor_985_full_elias_2024: dTOR985
+      lift_metric_labels:
+        FieldWeightedLift: Field-weighted Lift
+        FieldExcess: Field excess (S - R)
+        SeedFieldExposure: Seed field exposure (S)
+      lift_predictor_labels:
+        STN: STN
+        SNr: SNr
+        RegionMean: Region mean
+      phase_display_labels:
+        Early: Early - Pre
+        Late: Late - Early
+        Post: Post - Late
+      atlas_grid_heatmap:
+        lift_metric: FieldExcess
+        orientation: metric-by-band
+        connectome_order:
+          - individualized_dti
+          - mgh_usc_hcp_32_horn_2017
+          - ppmi_85_ewert_2017
+          - dtor_985_full_elias_2024
+        max_width_mm: 150.0
+        max_height_mm: 210.0
+  contact_lmm_adjacent_id_random_intercept:
+    analysis_id: structural-connectivity-contact-lmm-adjacent-phase-id-random-intercept
+    outcome_change_basis: adjacent_phase
+    previous_phases:
+      Early: Pre
+      Late: Early
+      Post: Late
+    formula: "Value ~ Phase * X_z + (1 | ID)"
+    predictor_metrics: [FieldWeightedLift, FieldExcess, SeedFieldExposure]
+    minimum_n: 3
+    phase_levels: [Early, Late, Post]
+    reml: true
+    degrees_of_freedom: kenward-roger
+    slope_p_adjust: holm
+    phase_slope_contrasts: false
+    prediction_quantiles: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    display_limit: 1.0
+  cortical_allocation_lmm:
+    analysis_id: cortical-allocation-lmm
+    candidate_set_id: STNSNrplus-connected-regions-cortical-four
+    atlas_name: STNSNrplus-connected regions
+    regions: [M1, premotor, SMA, DLPFC]
+    formula: "Value ~ Phase * RelativeAllocation + (1 | ID) + (1 | ID:ContactUnitID)"
+    predictor_column: RelativeAllocation
+    joint_term: "Phase:RelativeAllocation"
+    minimum_n: 3
+    phase_levels: [Early, Late, Post]
+    reml: true
+    degrees_of_freedom: kenward-roger
+    slope_p_adjust: holm
+    phase_slope_contrasts: true
+    prediction_quantiles: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    bh_joint_planned_tests: 28
+  cortical_allocation_lmm_adjacent:
+    analysis_id: cortical-allocation-lmm-adjacent-phase
+    outcome_change_basis: adjacent_phase
+    previous_phases:
+      Early: Pre
+      Late: Early
+      Post: Late
+    candidate_set_id: STNSNrplus-connected-regions-cortical-four
+    atlas_name: STNSNrplus-connected regions
+    regions: [M1, premotor, SMA, DLPFC]
+    formula: "Value ~ Phase * RelativeAllocation + (1 | ID) + (1 | ID:ContactUnitID)"
+    predictor_column: RelativeAllocation
+    joint_term: "Phase:RelativeAllocation"
+    minimum_n: 3
+    phase_levels: [Early, Late, Post]
+    reml: true
+    degrees_of_freedom: kenward-roger
+    slope_p_adjust: holm
+    phase_slope_contrasts: true
+    prediction_quantiles: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    bh_joint_planned_tests: 28
+    additional_local_outcomes: *adjacent_additional_local_outcomes
+
+execution:
+  tck_chunk_size: 20000
+  hdf5_chunk_size: 100000
+  replacement: trash_existing
+
+outputs:
+  contact_mapping: tables/contact_mapping.csv
+  channel_lift: tables/channel_lift.csv
+  channel_field_weighted_lift: tables/channel_field_weighted_lift.csv
+  local_rows: tables/local_rows.csv
+  connectivity_rows: tables/connectivity_rows.csv
+  subject_aggregates: tables/subject_aggregates.csv
+  correlations: results/correlations.csv
+  contact_lmm_root: contact_lmm
+  contact_lmm_adjacent_root: contact_lmm/adjacent_phase
+  contact_lmm_adjacent_id_random_intercept_root: contact_lmm/adjacent_phase_id_random_intercept
+  cortical_allocation_lmm_root: cortical_allocation_lmm
+  cortical_allocation_lmm_adjacent_root: cortical_allocation_lmm/adjacent_phase
+  inputs_manifest: manifest/inputs.csv
+  outputs_manifest: manifest/outputs.csv
+  inventory: manifest/inventory.csv

@@ -1,0 +1,5 @@
+paths:
+  lct: /path/to/data/summary/cohort/subj/structured/baseline_covariates.csv
+  endpoints: /path/to/data/summary/stats/clinical-correlation-adjacent-phase/derived/clinical_endpoints.csv
+  predictors: /path/to/data/summary/stats/clinical-correlation-adjacent-phase/derived/adjacent_phase_predictors.csv
+  output_root: /path/to/results/submission/data/clinical-correlation/lct

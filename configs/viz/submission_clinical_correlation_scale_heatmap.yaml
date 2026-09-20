@@ -1,0 +1,86 @@
+visualization:
+  id: submission-clinical-correlation-scale-heatmap
+  kind: correlation_heatmap
+
+paths:
+  stats_root: /path/to/data/summary/stats/clinical-correlation-adjacent-phase
+  correlations: /path/to/data/summary/stats/clinical-correlation-adjacent-phase/results/correlations.csv
+  output_root: /path/to/results/submission/data/clinical-correlation
+  manifest_root: /path/to/results/submission/data/clinical-correlation/heatmap-by-scale
+
+inputs:
+  stats_analysis_id: clinical-correlation-adjacent-phase
+  accepted_statuses: [ok, insufficient_n, constant_input]
+  value_column: rho
+  p_column: p_holm
+  retained_p_columns: [p_raw, p_holm]
+  selected_scales: [UPDRS-III, PDQ-39]
+  selected_endpoints: [stn-3m, stn-snr-3m]
+
+figures:
+  - {id: clinical-correlation-scale, test_id: clinical-correlation, layout: phase_rows}
+  - {id: clinical-correlation-scale-composite, test_id: clinical-correlation, layout: phase_rows_composite}
+
+factor_levels:
+  Phase: [Early, Late, Post]
+  Lat: [Ipsi, Contra]
+  Polar: [Anodal, Cathodal]
+
+labels:
+  delta_prefix: "Δ"
+  polarity: {Anodal: "⊕", Cathodal: "⊖"}
+  region: {SNr: SNr, STN: STN, SNr-STN: "SNr–STN", "SNr→STN": "SNr→STN", SNr-STN-combined: "SNr→/-STN"}
+  domain: {local: Local, connectivity: Connectivity}
+  endpoint: {stn-3m: STN-DBS, stn-snr-3m: "STN+SNr-DBS"}
+  colorbar:
+    UPDRS-III: "Partial Spearman's ρ"
+    PDQ-39: "Partial Spearman's ρ"
+
+style:
+  font: {family: Arial Unicode MS, strip_pt: 7, tick_pt: 6, colorbar_pt: 6, star_pt: 7}
+  geometry_mm:
+    cell_size: {matrix: [3.0, 3.0]}
+    panel_gap: {phase_rows: [0.0, 3.0], phase_rows_composite: [0.0, 3.0]}
+    strip_top_height: 4.5
+    strip_right_width: 4.5
+    group_strip_right_width: 4.5
+    group_strip_pad: 2.0
+    strip_pad: 2.0
+    colorbar_width: 3.0
+    colorbar_pad: 2.0
+    colorbar_label_offset: 5.0
+  strips:
+    top_background: "#D7E3E0"
+    right_background: "#E3DCCF"
+    text_color: black
+    font_weight: bold
+  heatmap:
+    colormap: vik
+    na_color: "#D9D9D9"
+    value_mode: symmetric
+    value_limits: [-1.0, 1.0]
+    clip_display: false
+  grid: {color: black, width_pt: 0.60, alpha: 0.90}
+  significance:
+    basis: p_holm
+    hide_non_significant: true
+    text_color: white
+    thresholds:
+      - {p_lt: 0.001, label: "***"}
+      - {p_lt: 0.01, label: "**"}
+      - {p_lt: 0.05, label: "*"}
+  colorbar:
+    label: "Partial Spearman's ρ"
+    ticks: [-1.0, 0.0, 1.0]
+  transparent: true
+  dpi: 600
+
+outputs:
+  format: pdf
+  filename_template: "scale-{Scale}_domain-{Domain}_region-{RegionValue}_polar-{Polar}_lat-{Lat}_figure-clinical-correlation-heatmap.pdf"
+  composite_filename_template: "scale-{Scale}_domain-{Domain}_region-{RegionValue}_polar-Anodal_lat-Ipsi_figure-clinical-correlation-heatmap copy.pdf"
+  formal_png: false
+  hashes: false
+
+manifests: {figures: figures.csv, cells: cells.csv}
+execution: {on_error: fail, retry: false, cache: false, resume: false}

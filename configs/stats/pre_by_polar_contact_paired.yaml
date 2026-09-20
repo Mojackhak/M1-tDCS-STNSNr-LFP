@@ -1,0 +1,280 @@
+analysis:
+  id: pre-by-polar-contact-paired
+  question: Contact-paired Pre-period Anodal-minus-Cathodal comparability by laterality.
+
+paths:
+  table_root: /path/to/data/summary/table
+  feature_manifest: /path/to/data/summary/table/manifest/feature_outputs_all.csv
+  output_root: /path/to/data/summary/stats
+  derived_root: /path/to/data/summary/stats/derived/pre-by-polar-contact-paired
+  manifest_root: /path/to/data/summary/stats/manifest/pre-by-polar-contact-paired
+
+inputs:
+  manifest_select:
+    Stage: aggregate_contact
+    SourceStage: transform
+    AggregationLevel: contact
+    Representation: scalar
+  match_policy:
+    missing_whitelist: error
+    duplicate_whitelist: error
+    unlisted_candidates: report
+  row_filter:
+    IncludeAggregate: true
+    finite_columns: [Value]
+
+derivation:
+  kind: paired_difference
+  factor: Polar
+  minuend: Anodal
+  subtrahend: Cathodal
+  label: Anodal-minus-Cathodal
+  pair_columns: [ID, ContactUnitID, Phase, Lat, Band]
+  source_columns: [Record, Trial]
+  include_phases: [Pre]
+  unpaired: exclude_and_report
+  pickle_protocol: 5
+
+band_sets:
+  canonical: &canonical_bands
+    - delta
+    - theta
+    - alpha
+    - beta_low
+    - beta_high
+    - gamma_low
+    - gamma_high
+
+canonical_region:
+  local: &canonical_local_regions
+    - SNr
+    - STN
+  connectivity:
+    undirected: &canonical_undirected_pair_regions
+      - SNr-STN
+    directed: &canonical_directed_pair_regions
+      - "SNr→STN"
+
+feature_whitelist:
+  local:
+    region_column: Region
+    region_values: *canonical_local_regions
+    metrics:
+      aperiodic:
+        outputs:
+          mean-scalar:
+            bands: [exponent, offset]
+      burst:
+        outputs:
+          mean-scalar:
+            bands: *canonical_bands
+          duration-scalar:
+            bands: *canonical_bands
+          rate-scalar:
+            bands: *canonical_bands
+          occupancy-scalar:
+            bands: *canonical_bands
+      periodic:
+        outputs:
+          mean-scalar:
+            bands: *canonical_bands
+      raw_power:
+        outputs:
+          mean-scalar:
+            bands: *canonical_bands
+
+  connectivity:
+    region_column: PairRegion
+    metrics:
+      ciplv:
+        region_values: *canonical_undirected_pair_regions
+        outputs:
+          mean-scalar:
+            bands: *canonical_bands
+      imcoh_abs:
+        region_values: *canonical_undirected_pair_regions
+        outputs:
+          mean-scalar:
+            bands: *canonical_bands
+      wpli:
+        region_values: *canonical_undirected_pair_regions
+        outputs:
+          mean-scalar:
+            bands: *canonical_bands
+      psi:
+        region_values: *canonical_directed_pair_regions
+        outputs:
+          mean-scalar:
+            bands: *canonical_bands
+      trgc:
+        region_values: *canonical_directed_pair_regions
+        outputs:
+          mean-scalar:
+            bands: *canonical_bands
+
+strata:
+  Polar: [Anodal, Cathodal]
+
+grouping:
+  local: [Metric, FeatureOutput, Band, Region]
+  connectivity: [Metric, FeatureOutput, Band, PairRegion]
+
+model_data:
+  factor_levels:
+    Phase: [Pre]
+    Lat: [Ipsi, Contra]
+  factor_columns: [ID]
+  require_all_factor_levels_per_model: true
+  require_complete_subjects: false
+  minimum_n_ID: null
+
+model:
+  engine: lmer
+  formula: "Value ~ Lat + (1 | ID)"
+  reml: true
+  optimizer: default
+  df_method: kenward-roger
+
+tests:
+  - id: Lat
+    kind: joint_term
+    term: Lat
+
+  - id: Lat
+    kind: emmean_vs_null
+    x_var: Lat
+    "null": 0
+    weights: equal
+    confidence_level: 0.95
+    adjust_method: holm
+    adjust_scope: all_cells
+    primary_p: p_raw
+
+identity:
+  model_id_fields:
+    local: [Domain, Metric, FeatureOutput, Band, Region, Contrast]
+    connectivity: [Domain, Metric, FeatureOutput, Band, PairRegion, Contrast]
+  test_key_fields: [ModelID, TestKind, TestID]
+  field_key_case: lower-kebab
+  element_separator: "_"
+  key_value_separator: "-"
+  value_character_map:
+    "_": "-"
+    ":": "-"
+
+outputs:
+  inherit_source_parent:
+    path_column: Path
+    relative_to: table_root
+  hierarchy:
+    - source_parent
+    - Representation
+    - FeatureOutput
+    - Band
+    - RegionValue
+    - Contrast
+    - EngineDirectory
+  engine_directories:
+    lmer: lmer_model
+  result_identity_fields:
+    - AnalysisID
+    - ModelID
+    - TestKind
+    - TestID
+    - Engine
+  filename_fields:
+    test_result: [AnalysisID, TestID, TestKind, ResultType]
+    model_fit: [AnalysisID, ResultType]
+  filename_key_map:
+    AnalysisID: analysis
+    TestID: test
+    TestKind: kind
+    ResultType: result
+  element_separator: "_"
+  key_value_separator: "-"
+  value_character_map:
+    "_": "-"
+    ":": "-"
+  model_fit: true
+  diagnostic_plots: false
+
+manifests:
+  models:
+    filename: models.csv
+    fields:
+      - AnalysisID
+      - ModelID
+      - Engine
+      - Formula
+      - Domain
+      - Metric
+      - FeatureOutput
+      - Representation
+      - Band
+      - RegionVariable
+      - RegionValue
+      - Contrast
+      - InputPath
+      - SourcePath
+      - IncludeAggregateRequired
+      - FiniteValueRequired
+      - n_rows
+      - n_ID
+      - n_ID_both_lat
+      - n_ID_complete2
+      - n_contact_units
+      - n_contact_units_ipsi
+      - n_contact_units_contra
+      - Singular
+      - Status
+      - Message
+  tests:
+    filename: tests.csv
+    fields:
+      - AnalysisID
+      - ModelID
+      - TestKind
+      - TestID
+      - Term
+      - XVar
+      - PanelVar
+      - FacetVar
+      - Weights
+      - ConfidenceLevel
+      - AdjustMethod
+      - AdjustScope
+      - "Null"
+      - PrimaryP
+      - Status
+      - Message
+  outputs:
+    filename: outputs.csv
+    fields:
+      - AnalysisID
+      - ModelID
+      - TestKind
+      - TestID
+      - ResultType
+      - Path
+      - Rows
+      - Columns
+      - Status
+  derived_tables:
+    filename: derived_tables.csv
+    fields:
+      - AnalysisID
+      - Domain
+      - Metric
+      - FeatureOutput
+      - InputPath
+      - DerivedPath
+      - AnodalRows
+      - CathodalRows
+      - PairedRows
+      - UnpairedAnodalRows
+      - UnpairedCathodalRows
+
+execution:
+  on_singular: continue
+  on_not_estimable: record
+  on_error: fail

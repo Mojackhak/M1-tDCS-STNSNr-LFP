@@ -1,0 +1,68 @@
+visualization:
+  id: lfp-programming-intensity
+  kind: programming_intensity
+
+paths:
+  stats_root: /path/to/data/summary/stats/lfp-programming-intensity/region
+  correlations: /path/to/data/summary/stats/lfp-programming-intensity/region/results/correlations.csv
+  model_input: /path/to/data/summary/stats/lfp-programming-intensity/region/derived/model_input_long.csv
+  jitter_summary: /path/to/data/summary/stats/lfp-programming-intensity/region/results/jitter_summary.csv
+  output_root: /path/to/data/summary/viz/lfp-programming-intensity/region
+  manifest_root: /path/to/data/summary/viz/lfp-programming-intensity/region/manifest
+
+inputs:
+  strategy: region
+  stats_analysis_id: lfp-programming-intensity
+  effect_column: rho
+  p_column: p_holm
+  fit_style_config: submission_clinical_correlation_adjacent_phase_fit.yaml
+  selection: {model: M0, status: ok, p_lt: 0.05}
+
+figures:
+  - {id: heatmap}
+  - {id: fit}
+  - {id: jitter}
+
+factor_levels:
+  Phase: [Early, Late, Post]
+  Lat: [Ipsi, Contra]
+  Polar: [Anodal, Cathodal]
+  Model: [M0, M1, M2]
+
+labels:
+  polarity: {Anodal: "⊕", Cathodal: "⊖"}
+  region: {SNr: SNr, STN: STN, SNr-STN: "SNr–STN", "SNr→STN": "SNr→STN"}
+  endpoint:
+    stn-only-stn: "STN-DBS: STN dose"
+    combined-stn: "STN+SNr-DBS: STN dose"
+    combined-snr: "STN+SNr-DBS: SNr dose"
+  jitter_adjustment:
+    M0: "Unadjusted"
+    M1: "UPDRS-III adjusted"
+    M2: "PDQ-39 adjusted"
+  phase_contrast: {Early: "Early−Pre", Late: "Late−Early", Post: "Post−Late"}
+
+style:
+  font: {family: Arial Unicode MS, strip_pt: 7, axis_pt: 7, tick_pt: 6, colorbar_pt: 7, star_pt: 7}
+  heatmap: {colormap: vik, value_limits: [-1.0, 1.0], na_color: "#D9D9D9"}
+  geometry_mm:
+    cell_size: [3.0, 3.0]
+    panel_gap: [3.0, 3.0]
+    jitter_box: [30.0, 25.0]
+    jitter_panel_gap: [5.0, 0.0]
+    jitter_adjustment_strip_height: 4.5
+    jitter_right_strip_width: 4.5
+    jitter_strip_pad: 2.0
+  strips: {top_background: "#D7E3E0", right_background: "#E3DCCF", jitter_text_color: black, jitter_font_weight: bold}
+  grid: {color: black, width_pt: 0.60, alpha: 0.90}
+  dpi: 600
+  transparent: true
+
+outputs:
+  format: pdf
+  filename_template: "{FigureID}.pdf"
+  formal_png: false
+  hashes: false
+
+manifests: {figures: figures.csv, coverage: coverage.csv}
+execution: {on_error: fail, retry: false, cache: false, resume: false}

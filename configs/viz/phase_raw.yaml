@@ -1,0 +1,101 @@
+visualization:
+  id: phase-raw
+  kind: raw
+
+paths:
+  table_root: /path/to/data/summary/table
+  feature_outputs_manifest: /path/to/data/summary/table/manifest/feature_outputs_all.csv
+  output_root: /path/to/data/summary/viz
+  manifest_root: /path/to/data/summary/viz/manifest/phase-raw
+
+inputs:
+  stage: aggregate_region
+  source_stage: normalize
+  aggregation_level: region
+  representation: raw
+  row_filter:
+    IncludeAggregate: true
+    finite_nested_value: true
+  selectors:
+    local:
+      canonical_region: [SNr, STN]
+      polar: [Anodal, Cathodal]
+      features:
+        - {metric: burst, feature_output: na-raw, bands: [All]}
+        - {metric: periodic, feature_output: na-raw, bands: [All]}
+        - {metric: raw_power, feature_output: na-raw, bands: [All]}
+    connectivity:
+      canonical_region: [SNr-STN]
+      polar: [Anodal, Cathodal]
+      features:
+        - {metric: ciplv, feature_output: na-raw, bands: [All]}
+        - {metric: imcoh_abs, feature_output: na-raw, bands: [All]}
+        - {metric: wpli, feature_output: na-raw, bands: [All]}
+        - {metric: psi, feature_output: na-raw, bands: [All], canonical_region: ["SNr→STN"]}
+        - {metric: trgc, feature_output: na-raw, bands: [All], canonical_region: ["SNr→STN"]}
+
+figures:
+  - {id: Phase, layout: marginal}
+  - {id: Phase-Lat, layout: laterality_rows, row_var: Lat, row_levels: [Ipsi, Contra]}
+
+factor_levels:
+  Phase: [Pre, Early, Late, Post]
+  Lat: [Ipsi, Contra]
+
+labels:
+  polarity: {Anodal: "⊕", Cathodal: "⊖"}
+  region: {SNr: SNr, STN: STN, SNr-STN: "SNr–STN", "SNr→STN": "SNr→STN"}
+  bands: {delta: "δ", theta: "θ", alpha: "α", beta_low: "low-β", beta_high: "high-β", gamma_low: "low-γ", gamma_high: "high-γ"}
+  colorbar:
+    burst: 'Δ $\log_{10}$ burst amplitude (V)'
+    periodic: "Δ periodic power (dB)"
+    raw_power: "Δ total power (dB)"
+    ciplv: 'Δ $\operatorname{logit}$(ciPLV)'
+    imcoh_abs: 'Δ $z_{\mathrm{Fisher}}$(|ImCoh|)'
+    wpli: 'Δ $\operatorname{logit}$(wPLI)'
+    psi: "Δ PSI"
+    trgc: "Δ TRGC"
+
+style:
+  font: {family: Arial Unicode MS, axis_pt: 7, strip_pt: 7, tick_pt: 6, colorbar_pt: 6}
+  line_width_pt: {default: 0.60, boundary: 0.60}
+  geometry_mm:
+    panel_width: 30
+    panel_height: 25
+    panel_gap: [3, 3]
+    strip_top_height: 4.5
+    strip_right_width: 4.5
+    strip_pad: 2
+    x_label_offset: 5
+    y_label_offset: 7
+    colorbar_width: 3
+    colorbar_pad: 2
+    colorbar_label_offset: 5
+  strips:
+    top_background: "#D7E3E0"
+    right_background: "#E3DCCF"
+    text_color: black
+    font_weight: bold
+  heatmap: {colormap: vik, value_mode: symmetric}
+  axes:
+    x_label: "Time (s)"
+    x_limits: [0, 240]
+    grid: false
+    show_top_right_spines: true
+    numeric_frequency_limits: [2, 90]
+    numeric_frequency_log: true
+  temporal_boundaries: [60, 120, 180]
+  frequency_boundaries: [4, 8, 13, 20, 35, 60]
+  boundary_line: {color: "#404040", style: ":", alpha: 0.60}
+  legend: {show: false}
+  transparent: true
+  dpi: 600
+
+outputs:
+  format: pdf
+  filename_template: "analysis-{AnalysisID}_test-{TestID}_figure-raw.pdf"
+  formal_png: false
+  hashes: false
+
+manifests: {figures: figures.csv, coverage: coverage.csv}
+execution: {on_error: fail, retry: false, cache: false, resume: false}

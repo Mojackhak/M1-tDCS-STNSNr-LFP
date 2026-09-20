@@ -1,0 +1,22 @@
+submission:
+  id: clinical-correlation
+
+configs:
+  heatmap: configs/viz/submission_clinical_correlation_heatmap.yaml
+  scale_heatmap: configs/viz/submission_clinical_correlation_scale_heatmap.yaml
+  fit: configs/viz/submission_clinical_correlation_fit.yaml
+
+paths:
+  output_root: /path/to/results/submission/data/clinical-correlation
+
+publish:
+  root_tables:
+    - correlations.csv
+    - significant-p-holm.csv
+    - figures.csv
+
+execution:
+  on_error: fail
+  retry: false
+  cache: false
+  resume: false

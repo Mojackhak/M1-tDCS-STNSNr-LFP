@@ -1,0 +1,124 @@
+visualization:
+  id: submission-pre-contact-signed-logp-heatmap
+  kind: signed_logp_heatmap
+
+paths:
+  stats_root: /path/to/data/summary/stats
+  models_manifest: /path/to/data/summary/stats/manifest/pre-by-polar-contact-paired/models.csv
+  stats_outputs_manifest: /path/to/data/summary/stats/manifest/pre-by-polar-contact-paired/outputs.csv
+  output_root: /path/to/results/submission/data/Pre
+  manifest_root: /path/to/results/submission/data/Pre/heatmap
+
+inputs:
+  stats_analysis_id: pre-by-polar-contact-paired
+  accepted_model_statuses: [ok, singular, convergence_warning]
+  test_kind: emmean_vs_null
+  result_type: null-test
+  effect_column: emmean
+  p_column: p_holm
+  retained_p_columns: [p_raw, p_holm]
+  contrast: Anodal-minus-Cathodal
+
+figures:
+  - {id: Lat, test_id: Lat, layout: lat_rows_phase_columns}
+
+factor_levels:
+  Phase: [Pre]
+  Lat: [Ipsi, Contra]
+
+labels:
+  polarity: {Anodal: "⊕", Cathodal: "⊖"}
+  contrast: {Anodal-minus-Cathodal: "⊕−⊖"}
+  region: {SNr: SNr, STN: STN, SNr-STN: "SNr–STN", "SNr→STN": "SNr→STN", SNr-STN-combined: "SNr→/-STN", Params: Params}
+
+matrices:
+  orientations:
+    banded: [band-by-parameter, parameter-by-band]
+    aperiodic: [parameter-by-region, region-by-parameter]
+  banded:
+    rows:
+      - {value: delta, label: "δ"}
+      - {value: theta, label: "θ"}
+      - {value: alpha, label: "α"}
+      - {value: beta_low, label: "low-β"}
+      - {value: beta_high, label: "high-β"}
+      - {value: gamma_low, label: "low-γ"}
+      - {value: gamma_high, label: "high-γ"}
+    groups:
+      local:
+        domain: local
+        regions: [SNr, STN]
+        columns:
+          - {metric: periodic, feature_output: mean-scalar, label: Periodic power}
+          - {metric: raw_power, feature_output: mean-scalar, label: Total power}
+          - {metric: burst, feature_output: mean-scalar, label: Burst amplitude}
+          - {metric: burst, feature_output: duration-scalar, label: Burst duration}
+          - {metric: burst, feature_output: rate-scalar, label: Burst rate}
+          - {metric: burst, feature_output: occupancy-scalar, label: Burst occupancy}
+      connectivity:
+        domain: connectivity
+        regions: [SNr-STN-combined]
+        columns:
+          - {metric: ciplv, feature_output: mean-scalar, label: ciPLV, source_region: SNr-STN}
+          - {metric: imcoh_abs, feature_output: mean-scalar, label: "|ImCoh|", source_region: SNr-STN}
+          - {metric: wpli, feature_output: mean-scalar, label: wPLI, source_region: SNr-STN}
+          - {metric: psi, feature_output: mean-scalar, label: PSI, source_region: "SNr→STN"}
+          - {metric: trgc, feature_output: mean-scalar, label: TRGC, source_region: "SNr→STN"}
+  aperiodic:
+    domain: local
+    display_region: Params
+    rows:
+      - {value: exponent, label: Exponent}
+      - {value: offset, label: Offset}
+    columns:
+      - {metric: aperiodic, feature_output: mean-scalar, label: SNr, source_region: SNr}
+      - {metric: aperiodic, feature_output: mean-scalar, label: STN, source_region: STN}
+
+style:
+  font: {family: Arial Unicode MS, strip_pt: 7, tick_pt: 6, colorbar_pt: 6, star_pt: 7}
+  geometry_mm:
+    cell_size:
+      banded: [3.0, 3.0]
+      aperiodic: [3.0, 3.0]
+    panel_gap:
+      comparison_rows: [0.0, 3.0]
+      comparison_rows_lat_columns: [3.0, 3.0]
+      lat_rows_phase_columns: [3.0, 3.0]
+    strip_top_height: 4.5
+    strip_right_width: 4.5
+    strip_pad: 2.0
+    colorbar_width: 3.0
+    colorbar_pad: 2.0
+    colorbar_label_offset: 5.0
+  strips:
+    top_background: "#D7E3E0"
+    right_background: "#E3DCCF"
+    text_color: black
+    font_weight: bold
+  heatmap:
+    colormap: vik
+    value_mode: symmetric
+    value_limits: [-3.0, 3.0]
+    clip_display: true
+  grid: {color: black, width_pt: 0.60, alpha: 0.90}
+  significance:
+    hide_non_significant: true
+    text_color: white
+    thresholds:
+      - {p_lt: 0.001, label: "***"}
+      - {p_lt: 0.01, label: "**"}
+      - {p_lt: 0.05, label: "*"}
+  colorbar:
+    label: 'Signed (⊕−⊖) $-\log_{10}(p_{\mathrm{Holm}})$'
+    ticks: [-3.0, 0.0, 3.0]
+  transparent: true
+  dpi: 600
+
+outputs:
+  format: pdf
+  filename_template: "{View}_{Orientation}_{Domain}_{RegionValue}_Anodal-minus-Cathodal.pdf"
+  formal_png: false
+  hashes: false
+
+manifests: {figures: figures.csv, cells: cells.csv}
+execution: {on_error: fail, retry: false, cache: false, resume: false}

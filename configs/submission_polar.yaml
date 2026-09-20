@@ -1,0 +1,26 @@
+submission:
+  id: polar
+
+configs:
+  stats: configs/stats/polarity_by_phase_lat_contact_paired.yaml
+  scalar: configs/viz/submission_polar_contact_scalar.yaml
+  heatmap: configs/viz/submission_polar_contact_scalar_heatmap.yaml
+
+paths:
+  output_root: /path/to/results/submission/data/polar
+
+publish:
+  root_tables:
+    - models.csv
+    - model-fit.csv
+    - statistics.csv
+    - coverage.csv
+    - pairing.csv
+    - figures.csv
+
+execution:
+  on_error: fail
+  retry: false
+  cache: false
+  resume: false
+

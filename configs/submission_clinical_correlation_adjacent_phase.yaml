@@ -1,0 +1,20 @@
+submission:
+  id: clinical-correlation-adjacent-phase
+
+configs:
+  fit: configs/viz/submission_clinical_correlation_adjacent_phase_fit.yaml
+
+paths:
+  output_root: /path/to/results/submission/data/clinical-correlation/adjacent-phase
+
+publish:
+  root_tables:
+    - correlations.csv
+    - significant-p-holm.csv
+    - figures.csv
+
+execution:
+  on_error: fail
+  retry: false
+  cache: false
+  resume: false
